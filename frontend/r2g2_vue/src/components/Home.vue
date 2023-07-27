@@ -51,7 +51,7 @@ export default {
             size="large"
           >
             <el-option
-              v-for="item in options"
+              v-for="item in options1"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -61,13 +61,13 @@ export default {
         <div class="m-4">
           <p>Choose the topics of interest within the news data</p>
           <el-select
-            v-model="value1"
+            v-model="value2"
             multiple
             placeholder="Select"
             size="large"
           >
             <el-option
-              v-for="item in options"
+              v-for="item in options2"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -82,14 +82,40 @@ export default {
       <el-header style="text-align: right; font-size: 12px">
       </el-header>
       <el-main>
+        <MapComponent />
       </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script>
+import MapComponent from './MapComponent.vue';
 
+
+export default {
+  components: {
+    MapComponent,
+  },
+  data() {
+    return {
+      value: '',
+      value1: [],
+      value2: [],
+      options: [  
+        {value: 'English', label: 'English'},
+        {value: 'Deutsch', label: 'Deutsch'},
+      ],
+      options1: [
+        // Define options for the first el-select here
+      ],
+      options2: [
+        // Define options for the second el-select here
+      ]
+    };
+  }
+};
 </script>
+
 
 <style scoped>
 .layout-container .el-header {
@@ -103,6 +129,12 @@ export default {
 }
 .layout-container .el-main {
   padding: 0;
+}
+
+/* New styles for the map component */
+.layout-container .el-main .map-component {
+  width: 100%;
+  height: 100%;
 }
 
 </style>
