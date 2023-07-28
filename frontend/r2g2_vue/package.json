@@ -10,15 +10,19 @@
   "dependencies": {
     "axios": "^1.4.0",
     "chart.js": "^4.3.0",
+    "csv-parser": "^3.0.0",
     "element-plus": "^2.3.8",
     "vue": "^3.3.4",
     "vue-chartjs": "^5.2.0",
+    "vue-csv-import": "^4.1.2",
     "vue-i18n": "^9.3.0-beta.24",
     "vue-loading-overlay": "^6.0.3",
+    "vue-papa-parse": "^3.1.0",
     "vue-router": "^4.2.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",
+    "papaparse": "^5.4.1",
     "vite": "^4.3.9"
   }
 }

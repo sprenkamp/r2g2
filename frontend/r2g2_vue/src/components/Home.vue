@@ -11,21 +11,7 @@
       <button @click="changeLocale('Deutsch')">Deutsch</button>
     </div>
 </template>
-
-<script>
-export default {
-  methods: {
-    changeLocale(locale) {
-      this.$i18n.locale = locale;
-    }
-  }
-};
-
-</script>
-
-<style>
-
-</style> -->
+ -->
 
 <template>
   <el-container class="layout-container" style="height: 700px">
@@ -33,43 +19,25 @@ export default {
       <el-scrollbar>
         <div class="m-4">
           <p>Sprache/Language</p>
-          <el-select v-model="value" class="m-2" placeholder="Select Language" size="large">
+          <el-select v-model="selectedLanguage" class="m-2" placeholder="Select" size="large" @change="$changeLocale(this.selectedLanguage)">
             <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-for="item in languageOptions"
+              :key="item"
+              :value="item"
             />
           </el-select>
         </div>
         <div class="m-4">
-          <p>Choose the topics of interest within the telegram data</p>
+          <p>{{$t('Choose the topics of interest within the news data')}}</p>
           <el-select
-            v-model="value1"
+            v-model="selectedNews"
             multiple
             placeholder="Select"
             size="large"
           >
             <el-option
-              v-for="item in options"
+              v-for="item in newsOptions"
               :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </div>
-        <div class="m-4">
-          <p>Choose the topics of interest within the news data</p>
-          <el-select
-            v-model="value1"
-            multiple
-            placeholder="Select"
-            size="large"
-          >
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
               :value="item.value"
             />
           </el-select>
@@ -79,16 +47,84 @@ export default {
     </el-aside>
 
     <el-container>
-      <el-header style="text-align: right; font-size: 12px">
+      <el-header style="text-align: center; font-size: 25px">
+        {{$t('Identification of the most relevant topics in the context of the Ukrainian Refugee Crisis in the media and social media')}}
       </el-header>
+
       <el-main>
+        <el-row>
+          <el-col :span="8"><div class="grid-content ep-bg-purple"/>
+            <p>{{$t('Select a country of interest')}}</p>
+            <el-select v-model="selectedCountry" class="m-2" placeholder="Select" size="large">
+              <el-option
+                v-for="(country) in countryOptions"
+                :key="country"
+                :value="country"
+              />
+            </el-select>
+          </el-col>
+          <el-col :span="8"><div class="grid-content ep-bg-purple-light" />
+            <p>{{$t('Choose a state of interest')}}</p>
+            <el-select v-model="selectedState" class="m-2" placeholder="Select" size="large">
+              <el-option
+                v-for="item in stateOptions"
+                :key="item.value"
+                :value="item.value"
+              />
+            </el-select>
+          </el-col>
+          <el-col :span="8"><div class="grid-content ep-bg-purple" />
+            <p>{{$t('Choose date range of interest')}}</p>
+            <el-slider v-model="selectedDate" :min="minDate" :max="maxDate">
+            </el-slider>
+          </el-col>
+        </el-row>
       </el-main>
+
     </el-container>
   </el-container>
 </template>
 
 <script>
 
+export default {
+  components: {
+  },
+
+  data() {
+    return {
+      selectedLanguage: '',
+      languageOptions: [ 'English', 'Deutsch'],
+      selectedNews: [],
+      newsOptions: [],
+      selectedCountry: '', 
+      countryOptions: ['all country analysed', 'Germany', 'Switzerland'],
+      selectedState: '',
+      stateOptions: [],
+      selectedDate: null,
+      minDate: null,
+      maxDate: null,
+    };
+  },
+
+  async created(){
+    const newsPath = 'https://raw.githubusercontent.com/sprenkamp/r2g2/main/frontend/r2g2_vue/src/data/df_news.csv'
+    const clusteredData = await this.$getCluster(newsPath);
+    this.newsOptions = clusteredData.map((cluster) => ({
+      value: cluster,
+    }));
+    const stateData = await this.$getState(newsPath);
+    this.stateOptions = stateData.map((state) => ({
+      value: state,
+    }));
+    const {minDate, maxDate} = await this.$getDate(newsPath);
+    this.minDate = minDate;
+    this.maxDate = maxDate;
+  },
+  methods: {
+    
+  },
+};
 </script>
 
 <style scoped>
@@ -103,6 +139,10 @@ export default {
 }
 .layout-container .el-main {
   padding: 0;
+}
+.grid-content {
+  border-radius: 4px;
+  min-height: 36px;
 }
 
 </style>

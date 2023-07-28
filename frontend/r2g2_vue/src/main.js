@@ -9,6 +9,8 @@ import "element-plus/dist/index.css";
 import Loading from "vue-loading-overlay";
 import "vue-loading-overlay/dist/css/index.css";
 
+import Plugin from './plugins';
+
 // language
 const i18n = createI18n({
     legacy: true,
@@ -21,6 +23,7 @@ const app = createApp(App);
 app.config.globalProperties.$axios = axios;
 app.use(ElementPlus);
 app.use(router);
-app.use(i18n)
+app.use(i18n);
+app.use(Plugin);
 app.component("Loading", Loading);
 app.mount('#app');
