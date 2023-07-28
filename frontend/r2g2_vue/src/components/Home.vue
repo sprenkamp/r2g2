@@ -86,6 +86,7 @@
 </template>
 
 <script>
+import MapComponent from './MapComponent.vue';
 
 export default {
   components: {
@@ -127,6 +128,7 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .layout-container .el-header {
   position: relative;
@@ -143,6 +145,12 @@ export default {
 .grid-content {
   border-radius: 4px;
   min-height: 36px;
+}
+
+/* New styles for the map component */
+.layout-container .el-main .map-component {
+  width: 100%;
+  height: 100%;
 }
 
 </style>
