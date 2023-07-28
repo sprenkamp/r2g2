@@ -79,6 +79,7 @@
             </el-slider>
           </el-col>
         </el-row>
+        
       </el-main>
 
     </el-container>
@@ -86,10 +87,11 @@
 </template>
 
 <script>
-import MapComponent from './MapComponent.vue';
+// import MapComponent from './MapComponent.vue';
 
 export default {
   components: {
+    // MapComponent
   },
 
   data() {
