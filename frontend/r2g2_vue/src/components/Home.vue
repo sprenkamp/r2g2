@@ -75,11 +75,11 @@
           </el-col>
           <el-col :span="8"><div class="grid-content ep-bg-purple" />
             <p>{{$t('Choose date range of interest')}}</p>
-            <el-slider v-model="selectedDate" :min="minDate" :max="maxDate">
-            </el-slider>
+            <el-slider v-model="selectedDate" :min="minDate" :max="maxDate" range />
           </el-col>
         </el-row>
-        
+      
+        <LineChart :chartData="chartData" />
       </el-main>
 
     </el-container>
@@ -88,10 +88,12 @@
 
 <script>
 // import MapComponent from './MapComponent.vue';
+import LineChart from './LineChart.vue'
 
 export default {
   components: {
     // MapComponent
+    LineChart,
   },
 
   data() {
@@ -107,6 +109,11 @@ export default {
       selectedDate: null,
       minDate: null,
       maxDate: null,
+      dateOptions: [],
+      chartData: {
+        labels: [],
+        datasets: [],
+      },
     };
   },
 
@@ -116,14 +123,39 @@ export default {
     this.newsOptions = clusteredData.map((cluster) => ({
       value: cluster,
     }));
+
     const stateData = await this.$getState(newsPath);
     this.stateOptions = stateData.map((state) => ({
       value: state,
     }));
-    const {minDate, maxDate} = await this.$getDate(newsPath);
-    this.minDate = minDate;
-    this.maxDate = maxDate;
+
+    const dateData = await this.$getDate(newsPath);
+    this.dateOptions = dateData;
+    this.$getDate(newsPath)
+    .then(() => {
+      this.minDate = new Date(this.$minDate).getTime();
+      this.maxDate = new Date(this.$maxDate).getTime();
+      this.selectedDate = [this.minDate, this.maxDate];
+    });
+
+    // Load data and draw chart
+    const allClustersData = {};
+    for (const targetDate of this.dateOptions) {
+      const allClustersCount = await this.$countProp(newsPath, targetDate);
+      allClustersData[targetDate] = allClustersCount;
+    }
+
+    this.chartData = {
+      labels: this.dateOptions,
+      datasets: this.newsOptions.map((option) => ({
+        label: option.value,
+        data: this.dateOptions.map((date) => allClustersData[date][option.value] || 0),
+        borderWidth: 2,
+        fill: false,
+      }))
+    };
   },
+
   methods: {
     
   },
