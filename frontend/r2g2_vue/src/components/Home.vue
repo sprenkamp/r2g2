@@ -118,7 +118,7 @@ export default {
   },
 
   async created(){
-    const newsPath = 'https://raw.githubusercontent.com/sprenkamp/r2g2/main/frontend/r2g2_vue/src/data/df_news.csv'
+    const newsPath = 'https://raw.githubusercontent.com/sprenkamp/r2g2/main/frontend/r2g2_vue/src/data/df_news_demo.csv'
     const clusteredData = await this.$getCluster(newsPath);
     this.newsOptions = clusteredData.map((cluster) => ({
       value: cluster,
@@ -143,7 +143,7 @@ export default {
     for (const targetDate of this.dateOptions) {
       const allClustersCount = await this.$countProp(newsPath, targetDate);
       allClustersData[targetDate] = allClustersCount;
-    }
+    };
 
     this.chartData = {
       labels: this.dateOptions,
@@ -152,12 +152,32 @@ export default {
         data: this.dateOptions.map((date) => allClustersData[date][option.value] || 0),
         borderWidth: 2,
         fill: false,
+        pointStyle: false,
       }))
     };
+
+    this.updateChartData();
   },
 
   methods: {
-    
+    async updateChartData() {
+      const allClustersData = {};
+      for (const targetDate of this.dateOptions) {
+        const allClustersCount = await this.$countProp(newsPath, targetDate);
+        allClustersData[targetDate] = allClustersCount;
+      }
+
+      this.chartData = {
+        labels: this.dateOptions,
+        datasets: this.newsOptions.map((option) => ({
+          label: option.value,
+          data: this.dateOptions.map((date) => allClustersData[date][option.value] || 0),
+          borderWidth: 2,
+          fill: false,
+          pointStyle: false,
+        })),
+      };
+    },
   },
 };
 </script>
