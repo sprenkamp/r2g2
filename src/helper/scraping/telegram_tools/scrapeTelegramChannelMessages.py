@@ -27,7 +27,7 @@ cluster = MongoClient(
 db = cluster["scrape"]
 collection = db["telegram"]
 
-# set index: these composite indexes can not one record specifically
+# set index: these composite indexes can not identify one record specifically
 # collection.create_index([("date", -1), ('channel_id'), ('message'), ], unique=True)
 
 def validate_file(f): #function to check if file exists
@@ -62,7 +62,8 @@ async def callAPI(input_file_path):
             else:
                 # avoid include the record which date is equivalent to max_time_db
                 max_time = search_max_date['update_time'] + datetime.timedelta(seconds=1)
-            print(max_time)
+
+            print("{} last update time:{}".format(chat, max_time))
 
             # update time
             update_time = datetime.datetime.now()
@@ -76,7 +77,6 @@ async def callAPI(input_file_path):
                 record['chat'] = chat
                 record['channel_id'] = message.peer_id.channel_id
                 record['date'] = message.date
-                record['edit_date'] = message.edit_date if message.edit_date is not None else ''
                 record['update_time'] = update_time
                 record['message'] = message.message if message.message is not None else ''
                 record['views'] = message.views if message.views is not None else 0
@@ -100,7 +100,7 @@ async def callAPI(input_file_path):
 
                 data_list.append(record)
 
-            print(chat, len(data_list))
+            print("data len:{}".format(len(data_list)))
 
             if len(data_list) > 0:
                 collection.insert_many(data_list)
