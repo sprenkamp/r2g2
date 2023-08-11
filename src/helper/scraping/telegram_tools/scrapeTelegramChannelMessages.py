@@ -23,7 +23,7 @@ ATLAS_USER = os.environ["ATLAS_USER"]
 
 # connect to db
 cluster = MongoClient(
-    "mongodb+srv://"+ATLAS_USER+":"+ATLAS_TOKEN+"@cluster0.9u0db2l.mongodb.net/?retryWrites=true&w=majority")
+    "mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(ATLAS_USER, ATLAS_TOKEN))
 db = cluster["scrape"]
 collection = db["telegram"]
 
@@ -79,24 +79,6 @@ async def callAPI(input_file_path):
                 record['date'] = message.date
                 record['update_time'] = update_time
                 record['message'] = message.message if message.message is not None else ''
-                record['views'] = message.views if message.views is not None else 0
-                record['forwards'] = message.forwards if message.forwards is not None else 0
-
-                if message.replies is None:
-                    record['replies'] = 0
-                else:
-                    record['replies'] = message.replies.replies
-
-                if message.reactions is None:
-                    record['reactions'] = []
-                else:
-                    reaction = list()
-                    for i in message.reactions.results:
-                        try:
-                            reaction.append({"emoticon": i.reaction.emoticon, 'count': i.count})
-                        except:
-                            reaction.append({"emoticon": "", 'count': 0})
-                    record['reactions'] = reaction
 
                 data_list.append(record)
 
