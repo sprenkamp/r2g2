@@ -29,7 +29,8 @@
         "Please find the summary below:" : "Please find the summary below:",
         "Your Summary 😊" : "Your Summary 😊",
         "Date": "Date",
-        "Count": "Count"
+        "Count": "Count",
+        "Select": "Select"
     },
 
     "Deutsch": {
@@ -58,6 +59,7 @@
         "Deutschland": "Germany",
         "Your Summary 😊" : "Ihre Zusammenfassung 😊",
         "Date": "Datum",
-        "Count": "Anzahl"
+        "Count": "Anzahl",
+        "Select": "Wählen"
     }
 }
