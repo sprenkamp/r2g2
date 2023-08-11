@@ -102,6 +102,11 @@ export default {
             "</div>",
           { permanent: false, sticky: true }
         );
+        // layer.on({
+        //   mouseover: this.highlightFeature,
+        //   mouseout: this.resetHighlight,
+        //   click: this.zoomToFeature,
+        // });
       };
     },
     language() {
@@ -158,7 +163,29 @@ export default {
         this.mapOptions.center = map.getCenter();
         console.log("Updated Center:", this.mapOptions.center);
       });
-    }
+    },
+
+    // 高亮 鼠标悬停
+    highlightFeature(e) {
+    const layer = e.target;
+      layer.setStyle({
+          weight: 5,
+          color: '#666',
+          dashArray: '',
+          fillOpacity: 0.7
+      });
+      if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+          layer.bringToFront();
+      }
+    },
+    // mouseout
+    resetHighlight(e) {
+      geojson.resetStyle(e.target);
+    },
+    // zoom automatically
+    zoomToFeature(e) {
+      map.fitBounds(e.target.getBounds());
+    },
   },
 };
 </script>

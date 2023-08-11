@@ -90,8 +90,10 @@
           </el-col>
           <el-col :span="13">
             <LineChart :chartData="chartData" />
+            <ChatBot/>
           </el-col>
         </el-row>
+
       </el-main>
 
     </el-container>
@@ -101,11 +103,13 @@
 <script>
 import MapComponent from './MapComponent.vue';
 import LineChart from './LineChart.vue'
+import ChatBot from './ChatBot.vue';
 
 export default {
   components: {
     MapComponent,
     LineChart,
+    ChatBot
   },
 
   data() {
