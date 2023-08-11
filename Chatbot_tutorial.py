@@ -7,8 +7,7 @@ from langchain.document_loaders.csv_loader import CSVLoader
 from langchain.vectorstores import FAISS
 import tempfile
 
-# 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
-# The code for an OpenAI API
+
 user_api_key = st.sidebar.text_input(
     label="#### Your OpenAI API key 👇",
     placeholder="Paste your openAI API key, sk-",
