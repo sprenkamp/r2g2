@@ -1,4 +1,4 @@
-name: scraping_telegram
+name: scraping_googlenews
 
 on:
   schedule:
@@ -13,7 +13,6 @@ jobs:
         uses: szenius/set-timezone@v1.2
         with:
           timezoneLinux: "Europe/Switzerland"
-          
 
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -21,11 +20,9 @@ jobs:
           python-version: '3.9'
           cache: 'pip' # caching pip dependencies
       - run: pip install -r requirements.txt
-          
+
       - name: execute py script
         env:
-          TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
-          TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
           ATLAS_USER: ${{ secrets.ATLAS_USER }}
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
-        run: python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/DACH.txt
+        run: python src/helper/scraping/traditional_news_tools/google/googlescapper.py
