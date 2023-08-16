@@ -1,4 +1,5 @@
 from telethon import TelegramClient, events, sync
+from telethon.sessions import StringSession
 import asyncio
 import os
 from dotenv import load_dotenv
@@ -18,6 +19,7 @@ from pymongo import collection
 # If you run code in Github platform, code will fetch secret/variables automatically
 TELEGRAM_API_ID = os.environ["TELEGRAM_API_ID"]
 TELEGRAM_API_HASH = os.environ["TELEGRAM_API_HASH"]
+TELEGRAM_STRING_TOKEN = os.environ["TELEGRAM_STRING_TOKEN"]
 ATLAS_TOKEN = os.environ["ATLAS_TOKEN"]
 ATLAS_USER = os.environ["ATLAS_USER"]
 
@@ -52,7 +54,7 @@ async def callAPI(input_file_path):
 
     for chat in tqdm(chats):
 
-        async with TelegramClient('SessionName', TELEGRAM_API_ID, TELEGRAM_API_HASH) as client:
+        async with TelegramClient(StringSession(TELEGRAM_STRING_TOKEN), TELEGRAM_API_ID, TELEGRAM_API_HASH) as client:
             # chat_short=chat.split('/')[-1]
 
             # find max time in the database
