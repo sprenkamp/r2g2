@@ -13,6 +13,7 @@ import re
 import tqdm
 from sklearn.cluster import KMeans
 nltk.download('stopwords')
+from src.database.accessMongoDB import *
 
 #TODO remove country from data sources
 #TODO find stopwords list for bg, cs, et, hu, lv, lt, mt, sk, sl, is
@@ -74,7 +75,11 @@ class BERTopicAnalysis:
 
     # read data telegram and prepare data for BERTopic
     def load_data_telegram(self):
-        self.df = pd.read_csv(self.input_data)
+        # self.df = pd.read_csv(self.input_data)
+
+        db = MongoDB()
+        self.df = db.load_all_record_from_db('scrape', 'telegram', [])
+
         self.df.dropna(subset=['messageText'],inplace=True)
         self.df.drop_duplicates(subset=['messageText'], keep='first',inplace=True)
         self.df = self.df[self.df['messageText'].map(type) == str]

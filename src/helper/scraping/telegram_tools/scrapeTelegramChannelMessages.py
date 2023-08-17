@@ -76,9 +76,9 @@ async def callAPI(input_file_path):
                 record = dict()
                 record['chat'] = chat
                 record['channel_id'] = message.peer_id.channel_id
-                record['date'] = message.date
+                record['messageDatetime'] = message.date
                 record['update_time'] = update_time
-                record['message'] = message.message if message.message is not None else ''
+                record['messageText'] = message.message if message.message is not None else ''
 
                 data_list.append(record)
 
