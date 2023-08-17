@@ -14,6 +14,8 @@ import tqdm
 from sklearn.cluster import KMeans
 nltk.download('stopwords')
 
+from src.database.accessMongoDB import *
+
 #TODO remove country from data sources
 #TODO find stopwords list for bg, cs, et, hu, lv, lt, mt, sk, sl, is
 #define stopwords, languages needed: de, nl, fr, bg, hr, el, cs, da, et, fi, fr, hu, en, it, lv, lt, mt, pl, pt, ro, sk, sl, sv, no, is, ro, uk, ru
@@ -74,7 +76,12 @@ class BERTopicAnalysis:
 
     # read data telegram and prepare data for BERTopic
     def load_data_telegram(self):
-        self.df = pd.read_csv(self.input_data)
+
+        # self.df = pd.read_csv(self.input_data)
+
+        db = MongoDB()
+        self.df = db.load_all_record_from_db('scrape', 'telegram', [])
+
         self.df.dropna(subset=['messageText'],inplace=True)
         self.df.drop_duplicates(subset=['messageText'], keep='first',inplace=True)
         self.df = self.df[self.df['messageText'].map(type) == str]
@@ -271,28 +278,30 @@ class BERTopicAnalysis:
 
 def main():
     # define parse arguments
+    print("*"*10)
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input_data', help="Specify the input file or folder", type=validate_path, required=True) 
-    parser.add_argument('-d', '--data_type', choices=['telegram', 'twitter', 'google_news', 'gdelt'], help='Choose a datasource', required=True)
-    parser.add_argument('-o', '--output_folder', help="Specify folder for results", required=True)
-    parser.add_argument('-k', '--k_cluster', help="number of topic cluster", required=False, default="auto")
-    parser.add_argument('-di', '--do_inference', help="does inference on data", action='store_true' , default=False)
-    parser.add_argument('-cuml_gpu', help="use cmul on GPU", action='store_true' , default=False)
+    # parser.add_argument('-d', '--data_type', choices=['telegram', 'twitter', 'google_news', 'gdelt'], help='Choose a datasource', required=True)
+    # parser.add_argument('-o', '--output_folder', help="Specify folder for results", required=True)
+    # parser.add_argument('-k', '--k_cluster', help="number of topic cluster", required=False, default="auto")
+    # parser.add_argument('-di', '--do_inference', help="does inference on data", action='store_true' , default=False)
+    # parser.add_argument('-cuml_gpu', help="use cmul on GPU", action='store_true' , default=False)
     args = parser.parse_args()
-    if args.data_type=="twitter" or args.data_type=="google_news":
-        with open("data/stopwords/country_stopwords.txt") as file: #load list of countries
-            country_stopwords = [line.rstrip() for line in file]
-            for country_stopword in  country_stopwords:
-                stopWords.append(country_stopword)
-    BERTopic_Analysis = BERTopicAnalysis(args.input_data,
-                                         args.data_type,
-                                         args.output_folder,
-                                         args.k_cluster,
-                                         args.do_inference,
-                                         args.cuml_gpu
-                                         )
-    # run all functions
-    BERTopic_Analysis.run_all()
+    print('*'*10, args.input_data)
+    # if args.data_type=="twitter" or args.data_type=="google_news":
+    #     with open("data/stopwords/country_stopwords.txt") as file: #load list of countries
+    #         country_stopwords = [line.rstrip() for line in file]
+    #         for country_stopword in  country_stopwords:
+    #             stopWords.append(country_stopword)
+    # BERTopic_Analysis = BERTopicAnalysis(args.input_data,
+    #                                      args.data_type,
+    #                                      args.output_folder,
+    #                                      args.k_cluster,
+    #                                      args.do_inference,
+    #                                      args.cuml_gpu
+    #                                      )
+    # # run all functions
+    # BERTopic_Analysis.run_all()
 
 if __name__ == '__main__':
     main()

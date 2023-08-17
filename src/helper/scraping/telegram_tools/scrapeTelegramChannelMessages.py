@@ -19,7 +19,6 @@ from pymongo import collection
 # If you run code in Github platform, code will fetch secret/variables automatically
 TELEGRAM_API_ID = os.environ["TELEGRAM_API_ID"]
 TELEGRAM_API_HASH = os.environ["TELEGRAM_API_HASH"]
-TELEGRAM_STRING_TOKEN = os.environ["TELEGRAM_STRING_TOKEN"]
 ATLAS_TOKEN = os.environ["ATLAS_TOKEN"]
 ATLAS_USER = os.environ["ATLAS_USER"]
 
@@ -54,7 +53,7 @@ async def callAPI(input_file_path):
 
     for chat in tqdm(chats):
 
-        async with TelegramClient(StringSession(TELEGRAM_STRING_TOKEN), TELEGRAM_API_ID, TELEGRAM_API_HASH) as client:
+        async with TelegramClient('SessionName', TELEGRAM_API_ID, TELEGRAM_API_HASH) as client:
             # chat_short=chat.split('/')[-1]
 
             # find max time in the database
@@ -78,9 +77,9 @@ async def callAPI(input_file_path):
                 record = dict()
                 record['chat'] = chat
                 record['channel_id'] = message.peer_id.channel_id
-                record['date'] = message.date
+                record['messageDatetime'] = message.date
                 record['update_time'] = update_time
-                record['message'] = message.message if message.message is not None else ''
+                record['messageText'] = message.message if message.message is not None else ''
 
                 data_list.append(record)
 
