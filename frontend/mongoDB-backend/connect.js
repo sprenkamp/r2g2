@@ -1,37 +1,3 @@
-
-// const { MongoClient, ServerApiVersion } = require('mongodb');
-// async function main(){
-//   /**
-//    * Connection URI. Update <username>, <password>, and <your-cluster-url> to reflect your cluster.
-//    * See https://docs.mongodb.com/ecosystem/drivers/node/ for more details
-//    */
-//   const uri = "mongodb+srv://jiayu1922:84BeNhuVyVRUWd5@cluster0.9u0db2l.mongodb.net/?retryWrites=true&w=majority";
-//   const client = new MongoClient(uri);
-
-//   try {
-//       // Connect to the MongoDB cluster
-//       await client.connect();
-
-//       // Make the appropriate DB calls
-//       await  listDatabases(client);
-
-//   } catch (e) {
-//       console.error(e);
-//   } finally {
-//       await client.close();
-//   }
-// }
-
-// main().catch(console.error);
-
-
-// async function listDatabases(client){
-//   databasesList = await client.db().admin().listDatabases();
-
-//   console.log("Databases:");
-//   databasesList.databases.forEach(db => console.log(` - ${db.name}`));
-// };
-
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const app = express();
@@ -45,7 +11,6 @@ app.get('/:databaseName/:collectionName', async (req, res) => {
   const collectionName = req.params.collectionName;
 
   try {
-    // const uri = "mongodb+srv://refugeeukraineai_test:FKFSPyoomgVAkufs@cluster0.fcobsyq.mongodb.net/";
     const uri = process.env.MONGO_URL;
     const client = new MongoClient(uri);
     await client.connect();
