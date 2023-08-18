@@ -13,7 +13,7 @@ import re
 import tqdm
 from sklearn.cluster import KMeans
 nltk.download('stopwords')
-from src.database.accessMongoDB import *
+from pymongo import MongoClient
 
 #TODO remove country from data sources
 #TODO find stopwords list for bg, cs, et, hu, lv, lt, mt, sk, sl, is
@@ -72,13 +72,20 @@ class BERTopicAnalysis:
         self.do_inference = do_inference
         self.cmul_gpu = cmul_gpu
 
+    def initialize_database(self):
+        ATLAS_TOKEN = os.environ["ATLAS_TOKEN"]
+        ATLAS_USER = os.environ["ATLAS_USER"]
+        cluster = MongoClient("mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(ATLAS_USER, ATLAS_TOKEN))
+        return cluster
 
     # read data telegram and prepare data for BERTopic
     def load_data_telegram(self):
         # self.df = pd.read_csv(self.input_data)
 
-        db = MongoDB()
-        self.df = db.load_all_record_from_db('scrape', 'telegram', [])
+        # load data from MongoDB
+        cluster = self.initialize_database()
+        data = cluster['scrape']['telegram']
+        self.df = pd.DataFrame(list(data.find()))
 
         self.df.dropna(subset=['messageText'],inplace=True)
         self.df.drop_duplicates(subset=['messageText'], keep='first',inplace=True)
