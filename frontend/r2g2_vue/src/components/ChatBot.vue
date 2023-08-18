@@ -61,20 +61,19 @@ export default {
   },
 };
 </script>
-  
+
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
 
 .chatbox-container {
-  position: fixed;
+  position: flex;
   bottom: 24px;
   right: 24px;
   z-index: 1000;
 }
-
 .container {
-  width: 360px;
-  height: 600px;
+  width: 600px;
+  height: 200px;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
@@ -83,7 +82,6 @@ export default {
   overflow: hidden;
   font-family: 'Roboto', sans-serif;
 }
-
 h1 {
   font-size: 24px;
   font-weight: 500;
@@ -94,7 +92,6 @@ h1 {
   background-color: #f7f7f7;
   border-bottom: 1px solid #e7e7e7;
 }
-
 .messageBox {
   padding: 16px;
   flex-grow: 1;
@@ -103,13 +100,9 @@ h1 {
   flex-direction: column;
   gap: 12px;
 }
-
 .messageFromUser,
 .messageFromChatGpt {
   display: flex; }
-
-
-
 .messageBox {
   max-height: 400px;
   overflow-y: auto;
@@ -118,19 +111,16 @@ h1 {
   border-bottom: 1px solid #f0f0f0;
   flex-grow: 1;
 }
-
 .messageFromUser,
 .messageFromChatGpt {
   display: flex;
   margin-bottom: 8px;
 }
-
 .userMessageWrapper,
 .chatGptMessageWrapper {
   display: flex;
   flex-direction: column;
 }
-
 .userMessageWrapper {
   align-self: flex-end;
 }
@@ -138,7 +128,6 @@ h1 {
 .chatGptMessageWrapper {
   align-self: flex-start;
 }
-
 .userMessageContent,
 .chatGptMessageContent {
   max-width: 60%;
@@ -148,20 +137,16 @@ h1 {
   font-size: 14px;
   line-height: 1.4;
 }
-
 .userMessageContent {
   background-color: #1877F2;
   color: white;
   border-top-left-radius: 0;
 }
-
 .chatGptMessageContent {
   background-color: #EDEDED;
   color: #222;
   border-top-right-radius: 0;
 }
-
-.userMessageTimestamp,
 .chatGptMessageTimestamp {
   font-size: 10px;
   color: #999;
@@ -171,7 +156,6 @@ h1 {
 .userMessageTimestamp {
   align-self: flex-end;
 }
-
 .chatGptMessageTimestamp {
   align-self: flex-start;
 }
@@ -182,7 +166,6 @@ h1 {
   padding: 8px;
   background-color: #f0f0f0;
 }
-
 .messageInput {
   flex-grow: 1;
   border: none;
@@ -193,7 +176,6 @@ h1 {
   border-radius: 24px;
   margin-right: 8px;
 }
-
 .askButton {
   background-color: #1877F2;
   color: white;
@@ -205,11 +187,9 @@ h1 {
   border-radius: 24px;
   transition: background-color 0.3s ease-in-out;
 }
-
 .askButton:hover {
   background-color: #145CB3;
 }
-
 @media (max-width: 480px) {
   .container {
     width: 100%;
@@ -217,14 +197,12 @@ h1 {
     border-radius: 0;
   }
 }
-.chatbox-container {
+/* .chatbox-container {
   position: fixed;
   bottom: 24px;
   right: 24px;
   z-index: 1000;
-}
-
-
+} */
 .messageBox {
   padding: 16px;
   flex-grow: 1;
@@ -239,3 +217,19 @@ h1 {
   display: flex;
 }
 </style>
+<!-- <style scoped>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</style> -->

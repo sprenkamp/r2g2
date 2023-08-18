@@ -13,10 +13,25 @@
 </template>
  -->
 
-<template>
-  <el-container class="layout-container" style="height: 100vh">
-    <el-aside width="300px">
-      <el-scrollbar>
+<!-- Home.vue -->
+
+<!--  
+  <el-radio-group v-model="isCollapse" style="margin-bottom: 20px">
+    <el-radio-button :label="false">expand</el-radio-button>
+    <el-radio-button :label="true">collapse</el-radio-button>
+  </el-radio-group>
+  <el-menu
+    default-active="2"
+    class="el-menu-vertical"
+    :collapse="isCollapse"
+    @open="handleOpen"
+    @close="handleClose"
+  >
+    <el-sub-menu index="1">
+      <template #title>
+        <span>Language</span>
+      </template>
+      <el-sub-menu index="1-1">
         <div class="m-4">
           <h3>Sprache/Language</h3>
           <el-select v-model="selectedLanguage" class="m-2" placeholder="Select" size="large" @change="$changeLocale(this.selectedLanguage)">
@@ -27,31 +42,110 @@
             />
           </el-select>
         </div>
-        <div class="m-4">
-          <h3>{{$t('Choose the topics of interest within the news data')}}</h3>
-          <el-select
-            v-model="selectedNews"
-            multiple
-            placeholder="Select"
-            size="large"
-          >
-            <el-option
-              v-for="item in newsOptions"
-              :key="item.value"
-              :value="item.value"
-            />
-          </el-select>
-        </div>
+      </el-sub-menu>
+    </el-sub-menu>
+    <el-menu-item index="2">
+      <template #title>Data Sources</template>
+      <el-menu-item-group>
+        <template #title><span>From</span></template>
+        <el-sub-menu index="2-1">
+          <template #title><span>News</span></template>
+          <el-menu-item index="2-1-1">
+            <div class="m-4">
+              <h3>{{$t('Choose the topics of interest within the news data')}}</h3>
+              <el-select
+                v-model="selectedNews"
+                multiple
+                placeholder="Select"
+                size="large"
+              >
+                <el-option
+                  v-for="item in newsOptions"
+                  :key="item.value"
+                  :value="item.value"
+                />
+              </el-select>
+            </div>
+          </el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="2-2">
+          <template #title><span>Twitter</span></template>
+          <el-menu-item index="2-2-1">
+              ()
+          </el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="2-3">
+          <template #title><span>X</span></template>
+          <el-menu-item index="2-3-1">
+
+          </el-menu-item>
+        </el-sub-menu>
+      </el-menu-item-group>
+    </el-menu-item>
+  </el-menu>  
+-->
+
+<template>
+  <el-container class="layout-container" style="height: 100vh">
+    <el-aside width="300px">
+      <el-scrollbar>
+        <el-collapse>
+          <el-collapse-item title="Language" name="1">
+            <!-- 语言选择框/language selection box-->
+            <div class="m-4">
+              <h3>Sprache/Language</h3>
+              <el-select v-model="selectedLanguage" class="m-2" placeholder="Select" size="large" @change="$changeLocale(this.selectedLanguage)">
+                <el-option
+                  v-for="item in languageOptions"
+                  :key="item"
+                  :value="item"
+                />
+              </el-select>
+            </div>
+          </el-collapse-item>
+          <el-collapse-item title="News" name="2">
+            <!-- 数据类别选择框/topics selection box -->
+            <div class="m-4">
+              <h3>{{$t('Choose the topics of interest within the news data')}}</h3>
+              <el-select
+                v-model="selectedNews"
+                multiple
+                placeholder="Select"
+                size="large"
+              >
+                <el-option
+                  v-for="item in newsOptions"
+                  :key="item.value"
+                  :value="item.value"
+                />
+              </el-select>
+            </div>
+          </el-collapse-item>
+          <el-collapse-item title="X" name="3">
+
+          </el-collapse-item>
+          <el-collapse-item title="Telegram" name="4">
+
+          </el-collapse-item>
+        </el-collapse>
+
+        <!-- 跳转测试页面路由 -->
+        <el-button color="FFFFFF" type="primary" class="button1">
+          <router-link to="/testpage" class="test">test</router-link>
+        </el-button>
       </el-scrollbar>
     </el-aside>
 
     <el-container>
+      <!-- 标题/title -->
       <el-header class="page-header" >
         <h1>{{$t('Identification of the most relevant topics in the context of the Ukrainian Refugee Crisis in the media and social media')}}</h1>
       </el-header>
-
+      <!-- 主页面/main -->
       <el-main>
+        <!-- 第一行/first row -->
         <el-row>
+          <!-- 第一行第一列 选择国家/first column in first row, select country -->
           <el-col :span="8"><div class="grid-content ep-bg-purple"/>
             <h3>{{$t('Select a country of interest')}}</h3>
             <el-select v-model="selectedCountry" class="m-2" placeholder="Select" size="large" clearable>
@@ -62,6 +156,7 @@
               />
             </el-select>
           </el-col>
+          <!-- 第一行第二列 选择州/second column in first row, select state -->
           <el-col :span="8"><div class="grid-content ep-bg-purple-light" />
             <h3>{{$t('Choose a state of interest')}}</h3>
             <el-select v-model="selectedState" class="m-2" placeholder="Select" size="large" clearable>
@@ -72,86 +167,94 @@
               />
             </el-select>
           </el-col>
+          <!-- 第一行第三列 时间轴/third column in first row, time slider -->
           <el-col :span="8"><div class="grid-content ep-bg-purple" />
             <h3>{{$t('Choose date range of interest')}}</h3>
             <el-slider v-model="selectedDate" :min="minDate" :max="maxDate" range @change="handleSliderChange"/>
           </el-col>
         </el-row>
+        <!-- 第二行 空行/second row, empty line -->
         <el-row>
           <div class="empty-line"></div>
         </el-row>
+        <!-- 第三行/third row -->
         <el-row>
+          <!-- 第三行第一列 地图/first column in third row, map -->
           <el-col :span="11">
-            <MapComponent class="map-component"
+            <MapComponent ref="mapcomponent" class="map-component"
               :selectedCountry="selectedCountry"
               :selectedState="selectedState"
               @countryAndStateChanged="handleCountryAndStateChanged"
+              @stateSelected="handleStateSelected"
             />
           </el-col>
+          <!-- 第三行第二列 折线图和chatbot/second column in third row, line chart and chatbot -->
           <el-col :span="13">
-            <LineChart :chartData="chartData" />
+            <loading :active="isLoading" :is-full-page="true" :loader="loader" />
+            <LineChart :chartData="chartData" :selectedState="selectedState" />
             <ChatBot/>
           </el-col>
         </el-row>
-
       </el-main>
-
     </el-container>
   </el-container>
 </template>
 
 <script>
 import MapComponent from './MapComponent.vue';
-import LineChart from './LineChart.vue'
+import LineChart from './LineChart.vue';
 import ChatBot from './ChatBot.vue';
 
 export default {
   components: {
     MapComponent,
     LineChart,
-    ChatBot
+    ChatBot,
   },
-
   data() {
     return {
-      newsPath: 'https://raw.githubusercontent.com/sprenkamp/r2g2/main/frontend/r2g2_vue/src/data/df_news_demo.csv',
-      selectedLanguage: '',
-      languageOptions: [ 'English', 'Deutsch'],
-      selectedNews: ['all found topics'],
-      newsOptions: [],
-      selectedCluster: null,
-      selectedCountry: '',
-      countryOptions: ['all countries analysed', 'Germany', 'Switzerland'],
-      selectedState: '',
-      stateOptions: [],
-      selectedDate: null,
-      selectedDateRange: null,
-      minDate: null,
-      maxDate: null,
-      dateOptions: [],
+      isLoading: false,
+      fullPage: false,
+      loader: "bars",
+      newsPath: 'https://raw.githubusercontent.com/sprenkamp/r2g2/main/frontend/r2g2_vue/src/data/df_news_demo.csv', // temporary mock data path
+      selectedLanguage: '',    // language property, define the current chosen language in web
+      languageOptions: [ 'English', 'Deutsch'], // define language options in select box
+      selectedNews: ['all found topics'], // 
+      newsOptions: [],         // store clusters options in data
+      selectedCountry: '',     // country property, define the current chosen country in web
+      countryOptions: ['all countries analysed', 'Germany', 'Switzerland'], // define country options in select box
+      selectedState: '',       // state property, define the current chosen state
+      stateOptions: [],        // define state options in select box
+      selectedDate: null,      // date property, define the date range in time slider
+      selectedDateRange: null, // store new date range when slider move
+      minDate: null,           // define min date
+      maxDate: null,           // define max date
+      dateOptions: [],         // define date options in time slider
       chartData: {
         labels: [],
         datasets: [],
-      },
-      filteredData: [],
-      filteredStateOptions: [],
+      },                       // define data for line chart
+      filteredData: [],        // store filtered data
     };
   },
 
   async created(){
     const newsPath = 'https://raw.githubusercontent.com/sprenkamp/r2g2/main/frontend/r2g2_vue/src/data/df_news_demo.csv'
-    const clusteredData = await this.$getCluster(newsPath);
     
+    // get all cluster in array like {1:xx, 2:yy, ...}
+    const clusteredData = await this.$getCluster(newsPath);
     this.newsOptions = clusteredData.map((cluster) => ({
       value: cluster,
     }));
     this.selectedNews = this.newsOptions.map(option => option.value);
 
+    // get all state
     const stateData = await this.$getState(newsPath);
     this.stateOptions = stateData.map((state) => ({
       value: state,
     }));
 
+    // get the min,max date as well as date range in type 1645660800000
     const dateData = await this.$getDate(newsPath);
     this.dateOptions = dateData;
     this.$getDate(newsPath)
@@ -159,10 +262,10 @@ export default {
       this.minDate = new Date(this.$minDate).getTime();
       this.maxDate = new Date(this.$maxDate).getTime();
       this.selectedDate = [this.minDate, this.maxDate];
-      console.log(this.minDate)
     });
 
     // Load data and draw chart
+    this.isLoading = true;
     const allClustersData = {};
     for (const targetDate of this.dateOptions) {
       const csvData = await this.$handleCSV(newsPath);
@@ -180,7 +283,7 @@ export default {
         pointStyle: false,
       }))
     };
-
+    this.isLoading = false;
     this.filteredData = await this.filterDataByCountryAndState();
 
   },
@@ -198,6 +301,7 @@ export default {
     },
     selectedCountry: 'updateCountryAndState',
     selectedState: 'updateCountryAndState',
+    
   },
 
   methods:{
@@ -214,11 +318,8 @@ export default {
       const csvData = await this.$handleCSV(this.newsPath);
       const countrySelected = this.DtoE(this.selectedCountry);
       return csvData.filter((item) => {
-        console.log(this.countrySelected)
         const countryMatch = !countrySelected || item.country === countrySelected;
         const stateMatch = !this.selectedState || item.state === this.selectedState;
-        // const countryMatch = !this.selectedCountry || item.country === this.selectedCountry;
-        // const stateMatch = !this.selectedState || item.state === this.selectedState;
         return countryMatch && stateMatch;
       });
     },
@@ -263,6 +364,10 @@ export default {
     handleCountryAndStateChanged({ selectedCountry, selectedState }) {
       this.selectedCountry = selectedCountry;
       this.selectedState = selectedState;
+    },
+    handleStateSelected(selectedState) {
+      this.selectedState = selectedState;
+      // this.$refs.mapcomponent.zoomToSelectedState(selectedState);
     },
   },
 };

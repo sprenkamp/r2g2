@@ -1,8 +1,9 @@
-<template>
+<!-- MapComponent.vue -->
 
+<template>
   <div>
     <div>
-      <span v-if="loading">Loading...</span>
+      <loading :active="isLoading" :is-full-page="true" :loader="loader" />
       <label for="checkbox">GeoJSON Visibility</label>
       <input
         id="checkbox"
@@ -55,7 +56,9 @@ export default {
   },
   data() {
     return {
-      loading: false,
+      isLoading: false,
+      fullPage: false,
+      loader: "bars",
       show: true,
       enableTooltip: true,
       zoom: null,
@@ -102,11 +105,11 @@ export default {
             "</div>",
           { permanent: false, sticky: true }
         );
-        // layer.on({
-        //   mouseover: this.highlightFeature,
-        //   mouseout: this.resetHighlight,
-        //   click: this.zoomToFeature,
-        // });
+        layer.on({
+          mouseover: this.highlightFeature,
+          mouseout: this.resetHighlight,
+          click: this.zoomToFeature,
+        });
       };
     },
     language() {
@@ -118,14 +121,15 @@ export default {
 
   },
   async created() {
-    this.loading = true;
+    this.isLoading = true;
     const response = await fetch("https://raw.githubusercontent.com/sprenkamp/r2g2/main/frontend/r2g2_vue/src/data/germany_switzerland.geojson")
     const data = await response.json();
     this.geojson = data;
-    this.loading = false;
+
+    this.isLoading = false;
   },
   watch: {
-    selectedCountry: "updateMapAndCenter"
+    selectedCountry: "updateMapAndCenter",
   },
   methods: {
     async updateMapAndCenter() {
@@ -163,6 +167,7 @@ export default {
         this.mapOptions.center = map.getCenter();
         console.log("Updated Center:", this.mapOptions.center);
       });
+      this.mapInstance = map;
     },
 
     // 高亮 鼠标悬停
@@ -170,7 +175,7 @@ export default {
     const layer = e.target;
       layer.setStyle({
           weight: 5,
-          color: '#666',
+          color: 'yellow',
           dashArray: '',
           fillOpacity: 0.7
       });
@@ -180,11 +185,20 @@ export default {
     },
     // mouseout
     resetHighlight(e) {
-      geojson.resetStyle(e.target);
+    const layer = e.target;
+      layer.setStyle({
+        weight: 2,
+        color: "blue",
+        opacity: 1,
+        fillColor: this.fillColor,
+        fillOpacity: 1
+      });
     },
     // zoom automatically
     zoomToFeature(e) {
-      map.fitBounds(e.target.getBounds());
+      const selectedState = e.target.feature.properties.state;
+      this.$emit('stateSelected', selectedState);
+      this.mapInstance.fitBounds(e.target.getBounds());
     },
   },
 };
