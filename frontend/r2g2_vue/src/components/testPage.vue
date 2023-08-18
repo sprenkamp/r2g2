@@ -1,6 +1,9 @@
 <template>
   <div>
     <h3>This is Test Page</h3>
+    <el-button color="FFFFFF" type="primary" class="button1">
+      <router-link to="/" class="test">back</router-link>
+    </el-button>
     <ul>
       <li v-for="item in data" :key="item._id">
         <p>ID: {{ item._id }}</p>
