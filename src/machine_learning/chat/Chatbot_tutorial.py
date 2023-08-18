@@ -7,18 +7,53 @@ from langchain.document_loaders.csv_loader import CSVLoader
 from langchain.vectorstores import FAISS
 import tempfile
 
-#testing VSCODE github pull request
 
 user_api_key = st.sidebar.text_input(
     label="#### Your OpenAI API key 👇",
     placeholder="Paste your openAI API key, sk-",
     type="password")
 
-uploaded_file = st.sidebar.file_uploader("upload", type="csv")
+#csvfile = st.sidebar.file_uploader("upload", type="csv")
 
-if uploaded_file :
+#MongoDB part start
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+import pymongo
+import pandas
+from pymongo import MongoClient
+cluster = MongoClient("mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(
+        ATLAS_USER, ATLAS_TOKEN))
+
+db = cluster["test"]
+collection = db["employee"]
+
+cursor = collection.find()
+
+mongo_docs = list(cursor)
+
+docs = pandas.DataFrame(columns=["_id","chat","channel","date","update_time","message"])
+
+for num, doc in enumerate( mongo_docs ):
+    # convert ObjectId() to str
+    doc["_id"] = str(doc["_id"])
+    # get document _id from dict
+    doc_id = doc["_id"]
+    # create a Series obj from the MongoDB dict
+    series_obj = pandas.Series(doc, name=doc_id)
+    # append the MongoDB Series obj to the DataFrame obj
+    docs = docs.append( series_obj )
+    
+# export MongoDB documents to CSV
+csvfile = docs.to_csv(sep=",") # CSV delimited by commas
+
+#MongoDB part end
+
+if csvfile :
     with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-        tmp_file.write(uploaded_file.getvalue())
+        tmp_file.write(csvfile.getvalue())
         tmp_file_path = tmp_file.name
 
     loader = CSVLoader(file_path=tmp_file_path, encoding="utf-8")
@@ -41,7 +76,7 @@ if uploaded_file :
         st.session_state['history'] = []
 
     if 'generated' not in st.session_state:
-        st.session_state['generated'] = ["Hello ! Ask me anything about " + uploaded_file.name + " 🤗"]
+        st.session_state['generated'] = ["Hello ! Ask me anything about " + csvfile.name + " 🤗"]
 
     if 'past' not in st.session_state:
         st.session_state['past'] = ["Hey ! 👋"]
