@@ -1,3 +1,5 @@
+// chatGpt.controller.js
+
 const { Configuration, OpenAIApi } = require("openai");
 require("dotenv").config();
 

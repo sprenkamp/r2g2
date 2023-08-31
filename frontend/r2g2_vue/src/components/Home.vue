@@ -1,89 +1,4 @@
-<!-- <template>
-    <h3>This is home page</h3>
-    <el-button color="FFFFFF" type="primary" class="button1">
-      <router-link to="/newspage" class="news">news</router-link>
-    </el-button>
-
-    <div>
-      <h1>{{ $t('Select a country of interest') }}</h1>
-      <p>{{ $t("all countries analysed") }}</p>
-      <button @click="changeLocale('English')">English</button>
-      <button @click="changeLocale('Deutsch')">Deutsch</button>
-    </div>
-</template>
- -->
-
 <!-- Home.vue -->
-
-<!--  
-  <el-radio-group v-model="isCollapse" style="margin-bottom: 20px">
-    <el-radio-button :label="false">expand</el-radio-button>
-    <el-radio-button :label="true">collapse</el-radio-button>
-  </el-radio-group>
-  <el-menu
-    default-active="2"
-    class="el-menu-vertical"
-    :collapse="isCollapse"
-    @open="handleOpen"
-    @close="handleClose"
-  >
-    <el-sub-menu index="1">
-      <template #title>
-        <span>Language</span>
-      </template>
-      <el-sub-menu index="1-1">
-        <div class="m-4">
-          <h3>Sprache/Language</h3>
-          <el-select v-model="selectedLanguage" class="m-2" placeholder="Select" size="large" @change="$changeLocale(this.selectedLanguage)">
-            <el-option
-              v-for="item in languageOptions"
-              :key="item"
-              :value="item"
-            />
-          </el-select>
-        </div>
-      </el-sub-menu>
-    </el-sub-menu>
-    <el-menu-item index="2">
-      <template #title>Data Sources</template>
-      <el-menu-item-group>
-        <template #title><span>From</span></template>
-        <el-sub-menu index="2-1">
-          <template #title><span>News</span></template>
-          <el-menu-item index="2-1-1">
-            <div class="m-4">
-              <h3>{{$t('Choose the topics of interest within the news data')}}</h3>
-              <el-select
-                v-model="selectedNews"
-                multiple
-                placeholder="Select"
-                size="large"
-              >
-                <el-option
-                  v-for="item in newsOptions"
-                  :key="item.value"
-                  :value="item.value"
-                />
-              </el-select>
-            </div>
-          </el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="2-2">
-          <template #title><span>Twitter</span></template>
-          <el-menu-item index="2-2-1">
-              ()
-          </el-menu-item>
-        </el-sub-menu>
-        <el-sub-menu index="2-3">
-          <template #title><span>X</span></template>
-          <el-menu-item index="2-3-1">
-
-          </el-menu-item>
-        </el-sub-menu>
-      </el-menu-item-group>
-    </el-menu-item>
-  </el-menu>  
--->
 
 <template>
   <el-container class="layout-container" style="height: 100vh">
@@ -192,7 +107,17 @@
           <el-col :span="13">
             <loading :active="isLoading" :is-full-page="true" :loader="loader" />
             <LineChart :chartData="chartData" :selectedState="selectedState" />
-            <ChatBot/>
+            <el-row>
+              <div class="empty-line"></div>
+            </el-row>
+            <el-container class="chatbot">
+              <el-button type="primary" style="margin-left: 16px" @click="drawer = true">
+                Ask Question with Chatbot
+              </el-button>
+              <el-drawer v-model="drawer" :with-header="false">
+                <ChatBot/>
+              </el-drawer>
+            </el-container>
           </el-col>
         </el-row>
       </el-main>
@@ -235,6 +160,7 @@ export default {
         datasets: [],
       },                       // define data for line chart
       filteredData: [],        // store filtered data
+      drawer: false,
     };
   },
 
@@ -419,5 +345,8 @@ export default {
   width: 100%;
   height: 100%;
 }
-
+.chatbot {
+  justify-content: center;
+  /* align-items: center; */
+}
 </style>
