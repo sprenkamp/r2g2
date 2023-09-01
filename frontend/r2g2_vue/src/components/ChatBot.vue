@@ -14,7 +14,17 @@
                         </div>
                     </div>
                 </template>
-            </div>
+                <div class="buttonContainer">
+                  <div class="buttonRow"> 
+                    <el-button type="success" plain class="chatButton" @click="sendQuestion('question template 1')">Question 1</el-button>
+                    <el-button type="success" plain class="chatButton" @click="sendQuestion('question template 2')">Question 2</el-button>
+                  </div>
+                  <div class="buttonRow"> 
+                    <el-button type="success" plain class="chatButton" @click="sendQuestion('question template 3')">Question 3</el-button>
+                    <el-button type="success" plain class="chatButton" @click="sendQuestion('question template 4')">Question 4</el-button>
+                  </div>
+                </div>
+              </div>
             <div class="inputContainer">
                 <el-autocomplete
                   v-model="currentMessage"
@@ -37,7 +47,7 @@
 
 <script>
 import axios from 'axios';
-
+import { Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
 export default {
   name: 'ChatBox',
   data() {
@@ -80,6 +90,10 @@ export default {
       return (questions) =>
         questions.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
     },
+    sendQuestion(question) {
+      this.currentMessage = question;
+      this.sendMessage(question);
+    }
   },
   async mounted() {
     this.questions = [
@@ -243,4 +257,19 @@ h1 {
 .messageFromChatGpt {
   display: flex;
 }
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  margin-top: auto;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
 </style>

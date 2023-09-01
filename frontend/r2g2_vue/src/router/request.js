@@ -28,7 +28,7 @@ const errorHandle = (status, info) => {
 };
 
 const instance = axios.create({
-  timeout: 5000,
+  timeout: 50000,
 });
 
 instance.interceptors.request.use(

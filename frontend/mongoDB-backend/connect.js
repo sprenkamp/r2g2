@@ -1,10 +1,12 @@
 const express = require('express');
+const compression = require('compression');
 const { MongoClient } = require('mongodb');
 const app = express();
 const dotenv = require("dotenv");
 const cors = require("cors")
 dotenv.config()
 app.use(cors());
+app.use(compression());
 
 app.get('/:databaseName/:collectionName', async (req, res) => {
   const databaseName = req.params.databaseName;

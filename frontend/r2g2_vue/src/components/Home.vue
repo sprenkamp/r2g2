@@ -40,7 +40,9 @@
 
           </el-collapse-item>
           <el-collapse-item title="Telegram" name="4">
-
+            <el-button color="FFFFFF" type="primary" class="button1">
+              <router-link to="/Telegrampage" class="Telegram">To Telegram Test Page</router-link>
+            </el-button>
           </el-collapse-item>
         </el-collapse>
 

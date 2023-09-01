@@ -11,6 +11,7 @@ import "vue-loading-overlay/dist/css/index.css";
 import 'leaflet/dist/leaflet.css';
 
 import Plugin from './plugins';
+import plugins4telegram from './plugins4telegram'
 
 // language
 const i18n = createI18n({
@@ -26,5 +27,6 @@ app.use(ElementPlus);
 app.use(router);
 app.use(i18n);
 app.use(Plugin);
+app.use(plugins4telegram)
 app.component("Loading", Loading);
 app.mount('#app');
