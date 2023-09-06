@@ -1,4 +1,4 @@
-from telethon import TelegramClient, events, sync
+from telethon import TelegramClient, events, sync, errors
 from telethon.sessions import StringSession
 import asyncio
 import os
@@ -10,6 +10,7 @@ import argparse
 
 from pymongo import MongoClient
 from pymongo import collection
+import pandas as pd
 
 
 # To run this code. You must get your own api_id and
@@ -48,41 +49,62 @@ async def callAPI(input_file_path):
     :output_folder_path: folder path where the output CSV file will be saved containing the scraped data
     """
 
-    with open(input_file_path) as file:
-        chats = file.readlines()
-        chats = [chat.replace('\n','') for chat in chats if not chat.startswith("#")]
+    data = pd.read_csv(input_file_path, keep_default_na=False)
 
-    for chat in tqdm(chats):
+    for index, row in tqdm(data.iterrows(), total=data.shape[0]):
+        country = row['country']
+        state = row['state']
+        city = row['city']
+        chat = row['chat']
+
+        # find max time in the database
+        time_col = 'date' # "update_time"
+        search_max_date = collection.find_one({"chat": chat}, sort=[(time_col, -1)])
+        if search_max_date is None:
+            max_time = None
+        else:
+            # avoid include the record which date is equivalent to max_time_db
+            max_time = search_max_date[time_col] + datetime.timedelta(seconds=1)
+
+        print("---*--- {} last {} time:{} ---*--- ".format(chat, time_col, max_time))
+
+        data_list = list()
 
         async with TelegramClient(StringSession(TELEGRAM_STRING_TOKEN), TELEGRAM_API_ID, TELEGRAM_API_HASH) as client:
-            # chat_short=chat.split('/')[-1]
-
-            # find max time in the database
-            search_max_date = collection.find_one({"chat": chat}, sort=[("update_time", -1)])
-            if search_max_date is None:
-                max_time = None
-            else:
-                # avoid include the record which date is equivalent to max_time_db
-                max_time = search_max_date['update_time'] + datetime.timedelta(seconds=1)
-
-            print("{} last update time:{}".format(chat, max_time))
-
-            # update time
-            update_time = datetime.datetime.now()
-
-            data_list = list()
 
             async for message in client.iter_messages(chat, reverse=True, offset_date=max_time):
-                # print(message)
 
-                record = dict()
-                record['chat'] = chat
-                record['channel_id'] = message.peer_id.channel_id
-                record['messageDatetime'] = message.date
-                record['update_time'] = update_time
-                record['messageText'] = message.message if message.message is not None else ''
+                if message.message is not None:
+                    record = dict()
+                    record['chat'] = chat
+                    record['channel_id'] = message.peer_id.channel_id
+                    record['date'] = message.date
+                    record['update_time'] = datetime.datetime.now()
+                    record['country'] = country
+                    record['state'] = state
+                    record['city'] = city
+                    record['message'] = message.message
+                    record['views'] = message.views if message.views is not None else 0
+                    record['forwards'] = message.forwards if message.forwards is not None else 0
 
-                data_list.append(record)
+                    if message.replies is None:
+                        record['replies'] = 0
+                    else:
+                        record['replies'] = message.replies.replies
+
+                    if message.reactions is None:
+                        record['reactions'] = []
+                    else:
+                        reaction = dict()
+                        for i in message.reactions.results:
+                            try:
+                                reaction[i.reaction.emoticon] = i.count
+                            except:
+                                # same message don't have emotion labels (reaction.emoticon)
+                                pass
+                        record['reactions'] = reaction
+
+                    data_list.append(record)
 
             print("data len:{}".format(len(data_list)))
 
@@ -91,17 +113,18 @@ async def callAPI(input_file_path):
             else:
                 print("no updated records")
 
-def main():
+
+if __name__ == '__main__':
     """
     example usage in command line:
     python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/DACH.txt
+    python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/chat_with_country.csv
     """
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input_file', help="Specify the input file", type=validate_file, required=True)
     args = parser.parse_args()
+
     loop = asyncio.get_event_loop()
     loop.run_until_complete(callAPI(args.input_file))
     loop.close()
-
-if __name__ == '__main__':
-    main()
