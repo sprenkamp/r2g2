@@ -72,7 +72,7 @@ async def callAPI():
             chat = row['chat']
 
             # find max time in the database
-            time_col = 'date'  # "update_time"
+            time_col = 'messageDatetime'  # "update_time"
             search_max_date = output_collection.find_one({"chat": chat}, sort=[(time_col, -1)])
             if search_max_date is None:
                 max_time = None
@@ -90,12 +90,12 @@ async def callAPI():
                     record = dict()
                     record['chat'] = chat
                     record['channel_id'] = message.peer_id.channel_id
-                    record['date'] = message.date
+                    record['messageDatetime'] = message.date
                     record['update_time'] = datetime.datetime.now()
                     record['country'] = country
                     record['state'] = state
                     record['city'] = city
-                    record['message'] = message.message
+                    record['messageText'] = message.message
                     record['views'] = message.views if message.views is not None else 0
                     record['forwards'] = message.forwards if message.forwards is not None else 0
 
