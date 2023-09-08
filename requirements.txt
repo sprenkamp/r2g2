@@ -9,3 +9,4 @@ tqdm==4.64.1
 requests==2.25.1 
 beautifulsoup4==4.9.3
 pygooglenews==0.1.2
+feedparser==6.0.8
