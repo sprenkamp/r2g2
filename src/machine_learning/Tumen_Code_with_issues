@@ -1,0 +1,75 @@
+import csv
+import os
+import openai
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.chat_models import ChatOpenAI
+from langchain.chains import ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory 
+from langchain.vectorstores import MongoDBAtlasVectorSearch
+from langchain.vectorstores.base import Document
+from dotenv import load_dotenv
+from pymongoarrow.monkey import patch_all
+import numpy
+import pymongo
+import pymongoarrow
+from pymongo import MongoClient
+import fastapi
+
+app = fastapi.FastAPI()
+
+from dotenv import load_dotenv
+load_dotenv()
+
+ATLAS_TOKEN = os.environ["ATLAS_TOKEN"]
+ATLAS_USER = os.environ["ATLAS_USER"]
+
+#@app.get("/chatbot")
+
+#def chatbot():
+#MongoDB part start
+
+client = MongoClient(
+    "mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(
+        ATLAS_USER, ATLAS_TOKEN))
+
+db = client["test"]
+col = db["telegram"]
+
+patch_all()
+
+df = col.find_pandas_all({})
+df.to_csv('csvfile.csv')
+
+#MongoDB part end
+
+def read_csv_into_vector_document(file, text_cols):
+    with open(file, newline='') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        text_data = []
+        for row in csv_reader:
+            text = ' '.join([row[col] for col in text_cols])
+            text_data.append(text)
+        return [Document(page_content=text) for text in text_data]
+
+api_key = os.environ.get('OPENAI_API_KEY')
+
+if not api_key:
+    print('OpenAI API key not found in environment variables.')
+    exit()
+
+data = read_csv_into_vector_document('csvfile.csv', ["_id","chat","channel_id","date","update_time","country","state","city","message","views","forwards","replies","reactions",])
+embeddings = OpenAIEmbeddings(openai_api_key=api_key)
+index_name = "langchain_demo"
+vectors = MongoDBAtlasVectorSearch.from_documents(data, embeddings, collection=col, index_name=index_name)
+memory = ConversationBufferMemory( 
+memory_key='chat_history', 
+return_messages=True, 
+output_key='answer')
+chain = ConversationalRetrievalChain.from_llm(
+    llm=ChatOpenAI(temperature=0.0, model_name='gpt-3.5-turbo', openai_api_key=api_key), retriever=vectors.as_retriever(), memory = memory)
+history = []
+
+while True:
+    query = input("Enter Your Query:")
+    data = vectors.similarity_search(query)
+    print(chain({"question": query, "chat_history": history})["answer"])
