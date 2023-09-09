@@ -86,7 +86,7 @@ async def callAPI():
 
             async for message in client.iter_messages(chat, reverse=True, offset_date=max_time):
 
-                if message.message is not None:
+                if message.message is not None and message.message != '':
                     record = dict()
                     record['chat'] = chat
                     record['channel_id'] = message.peer_id.channel_id
