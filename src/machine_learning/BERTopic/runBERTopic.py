@@ -39,7 +39,7 @@ for word in stopwords.words('italian'):
     stopWords.append(word)
 for word in stopwords.words('russian'):
     stopWords.append(word)
-with open("../../../../data/stopwords/stopwords_ua.txt") as file:  # add ukrainian stopwords loaded from .txt file
+with open("data/stopwords/stopwords_ua.txt") as file:  # add ukrainian stopwords loaded from .txt file
     ukrstopWords = [line.rstrip() for line in file]
 for stopwords in ukrstopWords:
     stopWords.append(stopwords)
@@ -365,13 +365,13 @@ def main():
 
     input_data = "scrape.telegram"
     data_type = "telegram"
-    output_folder = "../../../data/telegram/results/test"
+    output_folder = "data/telegram/results/test"
     output_db = 'bertModelTelegram'
     k_cluster = "auto"
     do_inference = False
     cuml_gpu = False
     if data_type == "twitter" or data_type == "google_news":
-        with open("../../../../data/stopwords/stopwords_ua.txt") as file:  # load list of countries
+        with open("data/stopwords/stopwords_ua.txt") as file:  # load list of countries
             country_stopwords = [line.rstrip() for line in file]
             for country_stopword in country_stopwords:
                 stopWords.append(country_stopword)
