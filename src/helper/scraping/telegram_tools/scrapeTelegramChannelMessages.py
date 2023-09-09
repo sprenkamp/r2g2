@@ -86,7 +86,7 @@ async def callAPI():
 
             async for message in client.iter_messages(chat, reverse=True, offset_date=max_time):
 
-                if message.message is not None:
+                if message.message is not None and message.message != '':
                     record = dict()
                     record['chat'] = chat
                     record['channel_id'] = message.peer_id.channel_id
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/chat_with_country.csv -o scrape.telegram
     
     Option 2: read chats from MongoDB
-    python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i scrape.telegramChatsWithState -o scrape.telegram
+    python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i scrape.telegramChatsWithState -o scrape.telegram_non
     """
 
     # # Option 1: read from local file
