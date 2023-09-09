@@ -143,7 +143,7 @@ if __name__ == '__main__':
     python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/chat_with_country.csv -o scrape.telegram
     
     Option 2: read chats from MongoDB
-    python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i scrape.telegramChatsWithState -o scrape.telegram_non
+    python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i scrape.telegramChatsWithState -o scrape.telegram
     """
 
     # # Option 1: read from local file
