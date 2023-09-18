@@ -25,13 +25,8 @@ client = MongoClient(
     "mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(
         ATLAS_USER, ATLAS_TOKEN))
 
-db = client["test"]
-col = db["telegram_sample"]
-
-patch_all()
-
-df = col.find_pandas_all({})
-df.to_csv('csvfile.csv')
+db = client["scrape"]
+col = db["telegram"]
 
 #MongoDB part end
 
@@ -64,7 +59,7 @@ QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt_template)
 
 chain = ConversationalRetrievalChain.from_llm(
     llm=llm, 
-    retriever=vectors.as_retriever(search_type = 'mmr', search_kwargs={'k': 5, 'lambda_mult': 0.25}), 
+    retriever=vectors.as_retriever(search_type = 'mmr', search_kwargs={'k': 10, 'lambda_mult': 0.25}), 
     memory = memory,
     return_source_documents=True,
     return_generated_question=True,
@@ -76,7 +71,7 @@ chat_history = []
 def query(chat_history):
     while True:
         query = input("Enter Your Query:")
-        metadata = vectors.max_marginal_relevance_search(query, k = 3, fetch_k= 5)
-        answer = chain({"question": query, "chat_history": chat_history})["answer"]
+        answer = chain({"question": query, "chat_history": chat_history})
+        print(answer)
         chat_history = [(query, answer)]
-        return answer
+        return answer["answer"]
