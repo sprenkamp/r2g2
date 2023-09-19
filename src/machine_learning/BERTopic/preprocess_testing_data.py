@@ -162,6 +162,7 @@ df_mongo['cluster_id'] = -1
 file_path = r"C:\Users\rocco\Documents\project0809\r2g2\src\machine_learning\BERTopic\df_telegram_test.csv"
 df_telegram = pd.read_csv(file_path, encoding='ISO-8859-1')
 
+# loads another CSV file and concatenates it with the previously processed MongoDB data with columns of cluster_name, cluster_id, text.
 df_combined = pd.concat([df_telegram, df_mongo], ignore_index=True)
 
 df_combined.to_csv(r"C:\Users\rocco\Documents\project0809\r2g2\src\machine_learning\BERTopic\df_telegram_concat.csv", index=False)
