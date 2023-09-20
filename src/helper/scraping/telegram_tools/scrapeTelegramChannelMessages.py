@@ -7,9 +7,12 @@ load_dotenv()
 import datetime
 from tqdm import tqdm
 import argparse
+from geosky import geo_plug
 
 from pymongo import MongoClient, errors
 import pandas as pd
+import openai
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 # To run this code. You must get your own api_id and
@@ -29,6 +32,15 @@ def validate_local_file(f): #function to check if file exists
         raise argparse.ArgumentTypeError("{0} does not exist".format(f))
     return f
 
+def validate_database(s):
+    database_name, collection_name = s.split('.')
+    cluster = MongoClient("mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(ATLAS_USER, ATLAS_TOKEN))
+    db = cluster[database_name]
+    list_of_collections = db.list_collection_names()
+    if collection_name not in list_of_collections:
+        raise Exception("Collection does not exit")
+    return s
+
 def initialize_database(database_name, collection_name):
     '''
     use names of database and collection to fetch specific collection
@@ -43,7 +55,118 @@ def initialize_database(database_name, collection_name):
     collection = cluster[database_name][collection_name]
     return collection
 
-async def callAPI():
+def get_country_to_state_dict():
+    '''
+    prepare country-state mapping
+    Returns:
+            a mapping with country as key and states as value
+            e.g. {'Switzerland':['Zurich', 'Zug', 'Vaud', 'Saint Gallen'...], 'Germany':[]}
+    '''
+
+    data_state = geo_plug.all_Country_StateNames()
+    data_state = data_state.replace('null', ' ')
+    res = eval(data_state)
+
+    mapping_state = {}
+    for element in res:
+        for k, v in element.items():
+            mapping_state[k] = v
+
+    mapping_state["Switzerland"].remove("Basel-City")
+    mapping_state["Switzerland"].append("Basel")
+
+    return mapping_state
+
+
+def get_state_to_city_dict():
+    '''
+    prepare state-city mapping
+    Returns:
+            a mapping with states as key and city as value
+            e.g. {'Zurich':["Winterthur", "Uster", ...], 'Basel':[]}
+    '''
+
+    data_city = geo_plug.all_State_CityNames()
+    data_city = data_city.replace('null', ' ')
+    res = eval(data_city)
+
+    mapping_city = {}
+    for element in res:
+        for k, v in element.items():
+            mapping_city[k] = v
+
+    mapping_city['North Rhine-Westphalia'].append('Cologne')
+    mapping_city['Bavaria'].append('Nuremberg')
+    mapping_city['Basel'] = mapping_city.pop('Basel-City')
+
+    return mapping_city
+
+
+def special_translate_chat(chat):
+    '''
+    In same chats, they are writen in German or French. This functions will standardize their spelling
+    Args:
+        chat: original chat (string)
+
+    Returns: chat with standard format
+
+    '''
+    return chat.replace("Lousanne", "Lausanne") \
+        .replace("BielBienne", "Biel/Bienne") \
+        .replace("Geneve", "Geneva") \
+        .replace("StGallen", "Saint Gallen")
+
+def parse_state_city(chat, country):
+
+    mapping_state = get_country_to_state_dict()
+    mapping_city = get_state_to_city_dict()
+    chat_standard = special_translate_chat(chat)
+
+    # parse state and city
+    chat_states = mapping_state[country]
+    state, city = '', ''
+    for s in chat_states:
+        chat_city = mapping_city[s]
+        for c in chat_city:
+            if c.upper() in chat_standard.upper():
+                city = c
+                state = s
+                break
+
+            if s.upper() in chat_standard.upper():
+                state = s
+    return state, city
+
+def get_embedding(text, model="text-embedding-ada-002"):
+    text = text.replace("\n", " ")
+    return openai.Embedding.create(input=[text], model=model)['data'][0]['embedding']
+
+def get_chats_list(input_file_path):
+    """
+    Args:
+        input_file_path: chats path
+
+    Returns: pandas dataframe. e.g.
+            |country|chat|
+            |Switzerland|https://t.me/zurich_hb_help|
+            |Switzerland|https://t.me/helpfulinfoforua|
+    """
+    countries, chats = list(), list()
+    with open(input_file_path, 'r') as file:
+        for line in file.readlines():
+            if line.startswith("#"):
+                country = line.replace('#', '').replace('\n', '')
+            else:
+                chat = line.replace('\n', '')
+
+                chats.append(chat)
+                countries.append(country)
+
+    df = pd.DataFrame(list(zip(countries, chats)),
+                      columns=['country', 'chat'])
+    return df
+
+async def callAPI(input_file_path):
     """
     This function takes an input file, output folder path
     It reads the input file, extracts the chats and then uses the TelegramClient to scrape message.text and message.date from each chat.
@@ -54,22 +177,17 @@ async def callAPI():
     :output_folder_path: folder path where the output CSV file will be saved containing the scraped data
     """
 
-    # # Option 1: read from local file
-    # data = pd.read_csv(input_file_path, keep_default_na=False)
-
-    # Option 2: read from Mongodb
-    query_res = input_collection.find({}, {'_id': 0})  # use find, find_one to perform query
-    data = pd.DataFrame(list(query_res))
+    data = get_chats_list(input_file_path)
 
     print(len(data))
 
     for index, row in tqdm(data.iterrows(), total=data.shape[0]):
 
         async with TelegramClient(StringSession(TELEGRAM_STRING_TOKEN), TELEGRAM_API_ID, TELEGRAM_API_HASH) as client:
-            country = row['country']
-            state = row['state']
-            city = row['city']
+
             chat = row['chat']
+            country = row['country']
+            state, city = parse_state_city(chat, country)
 
             # find max time in the database
             time_col = 'messageDatetime'  # "update_time"
@@ -98,6 +216,7 @@ async def callAPI():
                     record['messageText'] = message.message
                     record['views'] = message.views if message.views is not None else 0
                     record['forwards'] = message.forwards if message.forwards is not None else 0
+                    record['embedding'] = get_embedding(message.message)
 
                     if message.replies is None:
                         record['replies'] = 0
@@ -126,51 +245,23 @@ async def callAPI():
                 print("no updated records")
 
 
-def validate_database(s):
-    database_name, collection_name = s.split('.')
-    cluster = MongoClient("mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(ATLAS_USER, ATLAS_TOKEN))
-    db = cluster[database_name]
-    list_of_collections = db.list_collection_names()
-    if collection_name not in list_of_collections:
-        raise Exception("Collection does not exit")
-    return s
-
 if __name__ == '__main__':
     """
     example usage in command line:
     
-    Option 1: read chats from local file
-    python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/chat_with_country.csv -o scrape.telegram
+    python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/DACH.txt -o scrape.telegram
     
-    Option 2: read chats from MongoDB
-    python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i scrape.telegramChatsWithState -o scrape.telegram
     """
 
-    # # Option 1: read from local file
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('-i', '--input_file_path', help="Specify the input file", type=validate_local_file, required=True)
-    # parser.add_argument('-o', '--output_database', help="Specify the output database", required=True)
-    # args = parser.parse_args()
-    #
-    # o_database_name, o_collection_name = args.output_database.split('.')
-    # output_collection = initialize_database(o_database_name, o_collection_name)
-    #
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(callAPI(args.input_file_path))
-    # loop.close()
-
-
-    # Option 2: read from MongoDB
+    # Option 1: read from local file
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input_database', help="Specify the input database", type=validate_database, required=True)
+    parser.add_argument('-i', '--input_file_path', help="Specify the input file", type=validate_local_file, required=True)
     parser.add_argument('-o', '--output_database', help="Specify the output database", required=True)
     args = parser.parse_args()
 
-    i_database_name, i_collection_name = args.input_database.split('.')
     o_database_name, o_collection_name = args.output_database.split('.')
-    input_collection = initialize_database(i_database_name, i_collection_name)
     output_collection = initialize_database(o_database_name, o_collection_name)
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(callAPI())
+    loop.run_until_complete(callAPI(args.input_file_path))
     loop.close()
