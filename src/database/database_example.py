@@ -21,13 +21,20 @@ db_name = 'scrape'
 collection_name = 'telegram'
 collection = cluster[db_name][collection_name]
 
-# fetch data
-condition = {'chat': 'https://t.me/helpfulinfoforua'}
-selection = {'_id': 0}  # don't select id
-query_res = collection.find(condition, selection)  # use find, find_one to perform query
-df = pd.DataFrame(list(query_res))
+# ############### fetch data
+# condition = {'chat': 'https://t.me/helpfulinfoforua'}
+# selection = {'_id': 0}  # don't select id
+# query_res = collection.find(condition, selection)  # use find, find_one to perform query
+# df = pd.DataFrame(list(query_res))
+# print(df)
 
-print(df)
+############### sort & get top value
+data = collection.find({}, {"_id":0, "forwards":1, 'replies':1, 'messageText':1}).sort('forwards', -1).limit(1000)
+df = pd.DataFrame(list(data))
+df.sort_values(by=['forwards','replies'], ascending=[False, False])
+df['text_len'] = df['messageText'].apply(lambda x: len(x))
+print(df['text_len'].mean())
+df.to_csv('high_quality.csv')
 
 
 ############### discard this method to fetch data from database ###############
