@@ -138,9 +138,9 @@ cluster_mapping = {topic: idx for idx, topic in enumerate(topic_keywords.keys())
 print(cluster_mapping)
 
 # Load an existing CSV, map the cluster names to the corresponding cluster IDs
-# Change it into your own local path if need to run, several typos of cluster_name is modified(e.g., accomodation, consulate..)in original doc, please refer to the new df_telegram.csv
-file_path = r"C:\Users\rocco\Documents\project0809\r2g2\src\machine_learning\BERTopic\df_telegram.csv" 
-df = pd.read_csv(file_path, encoding='ISO-8859-1')
+# Change it into your own local path if need to run, several typos of cluster_name is modified(e.g., accomodation, consulate, Public Transport and Service, Transport personal Car..)in original doc, please refer to the above key of dictionary
+file_path = r"C:\Users\rocco\Documents\project0809\r2g2\src\machine_learning\BERTopic\df_telegram_test.csv" 
+df = pd.read_csv(file_path, encoding='UTF-8')
 df['cluster_id'] = df['cluster_name'].map(cluster_mapping)
 df.to_csv(file_path, index=False)
 
@@ -160,9 +160,8 @@ df_mongo['cluster_name'] = None
 df_mongo['cluster_id'] = -1
 
 file_path = r"C:\Users\rocco\Documents\project0809\r2g2\src\machine_learning\BERTopic\df_telegram_test.csv"
-df_telegram = pd.read_csv(file_path, encoding='ISO-8859-1')
+df_telegram = pd.read_csv(file_path, encoding='UTF-8')
 
-# loads another CSV file and concatenates it with the previously processed MongoDB data with columns of cluster_name, cluster_id, text.
 df_combined = pd.concat([df_telegram, df_mongo], ignore_index=True)
 
 df_combined.to_csv(r"C:\Users\rocco\Documents\project0809\r2g2\src\machine_learning\BERTopic\df_telegram_concat.csv", index=False)
