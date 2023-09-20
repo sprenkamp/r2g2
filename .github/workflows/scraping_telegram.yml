@@ -2,7 +2,7 @@ name: scraping_telegram
 
 on:
   schedule:
-    - cron: '0 0 * * 2,6' # At 00:00
+    - cron: '0 0 * * 1' # At 00:00
   workflow_dispatch:
 
 jobs:
@@ -29,4 +29,5 @@ jobs:
           TELEGRAM_STRING_TOKEN: ${{ secrets.TELEGRAM_STRING_TOKEN }}
           ATLAS_USER: ${{ secrets.ATLAS_USER }}
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
-        run: python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/DACH.txt
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/DACH.txt -o scrape.telegram
