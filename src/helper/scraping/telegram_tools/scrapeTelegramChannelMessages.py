@@ -12,7 +12,7 @@ from geosky import geo_plug
 from pymongo import MongoClient, errors
 import pandas as pd
 import openai
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.environ["OPENAI_API_KEY"]
 
 
 # To run this code. You must get your own api_id and
