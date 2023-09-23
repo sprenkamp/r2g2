@@ -36,6 +36,13 @@ df['text_len'] = df['messageText'].apply(lambda x: len(x))
 print(df['text_len'].mean())
 df.to_csv('high_quality.csv')
 
+############### remove field
+collection.update_one({"_id": i["_id"]}, {'$unset': {'embedding':1}})
+
+############### update field
+collection.update_one({"_id": i["_id"]}, {"$set": {"embedding":embedding}})
+
+
 
 ############### discard this method to fetch data from database ###############
 
