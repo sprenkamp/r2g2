@@ -1,4 +1,6 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 from langchain.prompts import PromptTemplate
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -7,14 +9,10 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory 
 from langchain.vectorstores import MongoDBAtlasVectorSearch
 
-from dotenv import load_dotenv
-from pymongoarrow.monkey import patch_all
 from pymongo import MongoClient
-from fastapi import BackgroundTasks,FastAPI
+from fastapi import FastAPI
 
 app = FastAPI()
-
-load_dotenv()
 
 ATLAS_TOKEN = os.environ["ATLAS_TOKEN"]
 ATLAS_USER = os.environ["ATLAS_USER"]
@@ -72,6 +70,6 @@ def query(chat_history):
     while True:
         query = input("Enter Your Query:")
         answer = chain({"question": query, "chat_history": chat_history})
-        print(answer)
+        print(answer["source_documents"])
         chat_history = [(query, answer)]
         return answer["answer"]
