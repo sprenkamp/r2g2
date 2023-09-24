@@ -67,9 +67,9 @@ chat_history = []
 
 @app.post("/query")
 def query(chat_history):
-    while True:
-        query = input("Enter Your Query:")
-        answer = chain({"question": query, "chat_history": chat_history})
-        print(answer["source_documents"])
-        chat_history = [(query, answer)]
-        return answer["answer"]
+    chat_history = [chat_history]
+    query = input("Enter Your Query:")
+    answer = chain({"question": query, "chat_history": chat_history})
+    print(answer["source_documents"])
+    chat_history.append((query, answer["answer"]))
+    return answer["answer"], chat_history
