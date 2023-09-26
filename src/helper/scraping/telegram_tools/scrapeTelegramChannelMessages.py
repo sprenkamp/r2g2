@@ -3,6 +3,7 @@ from telethon.sessions import StringSession
 import asyncio
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 import datetime
 from tqdm import tqdm
@@ -12,8 +13,8 @@ from geosky import geo_plug
 from pymongo import MongoClient, errors
 import pandas as pd
 import openai
-openai.api_key = os.environ["OPENAI_API_KEY"]
 
+openai.api_key = os.environ["OPENAI_API_KEY"]
 
 # To run this code. You must get your own api_id and
 # api_hash from https://my.telegram.org, under API Development.
@@ -27,10 +28,11 @@ ATLAS_TOKEN = os.environ["ATLAS_TOKEN"]
 ATLAS_USER = os.environ["ATLAS_USER"]
 
 
-def validate_local_file(f): #function to check if file exists
+def validate_local_file(f):  # function to check if file exists
     if not os.path.exists(f):
         raise argparse.ArgumentTypeError("{0} does not exist".format(f))
     return f
+
 
 def validate_database(s):
     database_name, collection_name = s.split('.')
@@ -40,6 +42,7 @@ def validate_database(s):
     if collection_name not in list_of_collections:
         raise Exception("Collection does not exit")
     return s
+
 
 def initialize_database(database_name, collection_name):
     '''
@@ -54,6 +57,7 @@ def initialize_database(database_name, collection_name):
     cluster = MongoClient("mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(ATLAS_USER, ATLAS_TOKEN))
     collection = cluster[database_name][collection_name]
     return collection
+
 
 def get_country_to_state_dict():
     '''
@@ -116,8 +120,8 @@ def special_translate_chat(chat):
         .replace("Geneve", "Geneva") \
         .replace("StGallen", "Saint Gallen")
 
-def parse_state_city(chat, country):
 
+def parse_state_city(chat, country):
     mapping_state = get_country_to_state_dict()
     mapping_city = get_state_to_city_dict()
     chat_standard = special_translate_chat(chat)
@@ -137,9 +141,11 @@ def parse_state_city(chat, country):
                 state = s
     return state, city
 
+
 def get_embedding(text, model="text-embedding-ada-002"):
     text = text.replace("\n", " ")
     return openai.Embedding.create(input=[text], model=model)['data'][0]['embedding']
+
 
 def get_chats_list(input_file_path):
     """
@@ -165,6 +171,7 @@ def get_chats_list(input_file_path):
     df = pd.DataFrame(list(zip(countries, chats)),
                       columns=['country', 'chat'])
     return df
+
 
 async def callAPI(input_file_path):
     """
@@ -216,7 +223,9 @@ async def callAPI(input_file_path):
                     record['messageText'] = message.message
                     record['views'] = message.views if message.views is not None else 0
                     record['forwards'] = message.forwards if message.forwards is not None else 0
-                    record['embedding'] = get_embedding(message.message)
+
+                    if len(message.message) > 40:
+                        record['embedding'] = get_embedding(message.message)
 
                     if message.replies is None:
                         record['replies'] = 0
@@ -248,14 +257,20 @@ async def callAPI(input_file_path):
 if __name__ == '__main__':
     """
     example usage in command line:
-    
+
     python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/DACH.txt -o scrape.telegram
-    
+
+    Read chats from DACH.txt and store telegram data to database.
+
+    (1) scrape telegram data
+    (2) get embedding of each sentence
+    (3) parse state and city from chat name
+
     """
 
-    # Option 1: read from local file
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input_file_path', help="Specify the input file", type=validate_local_file, required=True)
+    parser.add_argument('-i', '--input_file_path', help="Specify the input file", type=validate_local_file,
+                        required=True)
     parser.add_argument('-o', '--output_database', help="Specify the output database", required=True)
     args = parser.parse_args()
 
