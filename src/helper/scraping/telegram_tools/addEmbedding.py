@@ -54,20 +54,21 @@ def get_embedding(text, model="text-embedding-ada-002"):
     text = text.replace("\n", " ")
     return openai.Embedding.create(input=[text], model=model)['data'][0]['embedding']
 
-chats = get_chats_list('../../../../data/telegram/queries/DACH.txt')
-print(chats)
+if __name__ == '__main__':
+    chats = get_chats_list('../../../../data/telegram/queries/DACH.txt')
+    print(chats)
 
-for index, row in chats.iterrows():
-    condition = {'chat': row['chat']}
-    selection = {'_id': 1, 'messageText': 1, 'embedding':1 }
-    query_res = collection.find(condition, selection)  # use find, find_one to perform query
-    print(row['chat'])
-    for i in query_res:
-        if 'embedding' not in i and len(i['messageText']) > 40:
-            print(i)
-            embedding = get_embedding(i['messageText'])
-            collection.update_one({"_id": i["_id"]}, {"$set": {"embedding":embedding}})
+    for index, row in chats.iterrows():
+        condition = {'chat': row['chat']}
+        selection = {'_id': 1, 'messageText': 1, 'embedding':1 }
+        query_res = collection.find(condition, selection)  # use find, find_one to perform query
+        print(row['chat'])
+        for i in query_res:
+            if 'embedding' not in i and len(i['messageText']) > 40:
+                print(i)
+                embedding = get_embedding(i['messageText'])
+                collection.update_one({"_id": i["_id"]}, {"$set": {"embedding":embedding}})
 
-        # if 'embedding' in i and len(i['messageText']) < 40:
-        #     print(i)
-        #     collection.update_one({"_id": i["_id"]}, {'$unset': {'embedding':1}}) # remove field
+            # if 'embedding' in i and len(i['messageText']) < 40:
+            #     print(i)
+            #     collection.update_one({"_id": i["_id"]}, {'$unset': {'embedding':1}}) # remove field
