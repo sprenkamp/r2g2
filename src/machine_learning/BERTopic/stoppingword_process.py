@@ -48,7 +48,7 @@ def remove_emojis(text):
 df_telegram_concat = pd.read_csv(r"C:\Users\rocco\Documents\project0809\r2g2\src\machine_learning\BERTopic\df_telegram_concat.csv", encoding='UTF-8')
 
 # Apply preprocessing
-df_telegram_concat['text'] = df_telegram_concat['text'].apply(remove_links).apply(remove_emojis).apply(remove_stopwords)
+df_telegram_concat['text'] = df_telegram_concat['text'].apply(remove_links).apply(remove_emojis)
 
 # Drop rows where 'text' column is either NaN or empty string
 df_telegram_concat.dropna(subset=['text'], inplace=True)
