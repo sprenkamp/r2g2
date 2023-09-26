@@ -17,17 +17,29 @@ cluster = MongoClient(
     "mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(ATLAS_USER, ATLAS_TOKEN))
 
 # specify names of database and collection
-db_name = 'scrape'
-collection_name = 'telegram'
+db_name = 'test'
+collection_name = 'telegram_sample'
 collection = cluster[db_name][collection_name]
 
-# fetch data
+###############  query data
 condition = {'chat': 'https://t.me/helpfulinfoforua'}
 selection = {'_id': 0}  # don't select id
-query_res = collection.find(condition, selection)  # use find, find_one to perform query
+query_res = collection.find(condition, selection)
 df = pd.DataFrame(list(query_res))
 
-print(df)
+############### sort & get top value
+# get top 1000 forwards
+data = collection.find({}, {"_id":0, "forwards":1, 'replies':1, 'messageText':1}).sort('forwards', -1).limit(1000)
+df = pd.DataFrame(list(data))
+
+############### remove field
+# remove embedding
+collection.update_one({"_id": 'xxxxx'}, {'$unset': {'embedding':1}})
+
+############### update field
+# update embedding
+embedding = []
+collection.update_one({"_id": 'xxxxx'}, {"$set": {"embedding":embedding}})
 
 
 ############### discard this method to fetch data from database ###############
