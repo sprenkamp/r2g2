@@ -10,22 +10,21 @@ nltk.download('punkt')
 nltk.download('wordnet')
 nltk.download('stopwords')
 
-def remove_links(text):
-    return re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)
+# Initialize an empty list to hold the stopwords
+stopWords = []
 
 # Define and extend the stopwords list
-stopWords = set(stopwords.words('english'))
-languages = ['german', 'french', 'italian', 'russian']
+languages = ['english', 'german', 'french', 'italian', 'russian']
 for lang in languages:
-    stopWords.update(stopwords.words(lang))
+    stopWords.extend(stopwords.words(lang))  # Use extend to add multiple items to the list
 
 # Adding Ukrainian stopwords
 with open("data/stopwords/stopwords_ua.txt") as file:
-    ukrstopWords = set([line.rstrip() for line in file])
-stopWords.update(ukrstopWords)
+    ukrstopWords = [line.rstrip() for line in file]  # Reading lines from file and storing them in a list
+    stopWords.extend(ukrstopWords) 
 
-def remove_stopwords(text):
-    return " ".join([word for word in text.split() if word.lower() not in stopWords])
+def remove_links(text):
+    return re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)
 
 def remove_emojis(text):
     # The pattern will recognize most of the emojis in the text
@@ -45,7 +44,7 @@ def remove_emojis(text):
     return emoji_pattern.sub(r'', text)
 
 # Load your dataset
-df_telegram_concat = pd.read_csv(r"C:\Users\rocco\Documents\project0809\r2g2\src\machine_learning\BERTopic\df_telegram_concat.csv", encoding='UTF-8')
+df_telegram_concat = pd.read_csv("src/machine_learning/BERTopic/df_telegram_concat.csv", encoding='UTF-8')
 
 # Apply preprocessing
 df_telegram_concat['text'] = df_telegram_concat['text'].apply(remove_links).apply(remove_emojis)
@@ -55,4 +54,4 @@ df_telegram_concat.dropna(subset=['text'], inplace=True)
 df_telegram_concat = df_telegram_concat[df_telegram_concat['text'].str.strip() != ""]
 
 # Save the processed dataset
-df_telegram_concat.to_csv(r"C:\Users\rocco\Documents\project0809\r2g2\src\machine_learning\BERTopic\df_telegram_concat.csv", index=False, encoding='UTF-8')
+df_telegram_concat.to_csv("src/machine_learning/BERTopic/df_telegram_concat.csv", index=False, encoding='UTF-8')
