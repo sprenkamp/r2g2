@@ -19,7 +19,7 @@ for lang in languages:
     stopWords.extend(stopwords.words(lang))  # Use extend to add multiple items to the list
 
 # Adding Ukrainian stopwords
-with open("data/stopwords/stopwords_ua.txt") as file:
+with open("data/stopwords/stopwords_ua.txt", encoding='utf-8') as file:
     ukrstopWords = [line.rstrip() for line in file]  # Reading lines from file and storing them in a list
     stopWords.extend(ukrstopWords) 
 
@@ -44,7 +44,7 @@ def remove_emojis(text):
     return emoji_pattern.sub(r'', text)
 
 # Load your dataset
-df_telegram_concat = pd.read_csv("src/machine_learning/BERTopic/df_telegram_concat.csv", encoding='UTF-8')
+df_telegram_concat = pd.read_csv("src/machine_learning/BERTopic/df_telegram_concat_switzerland.csv", encoding='UTF-8')
 
 # Apply preprocessing
 df_telegram_concat['text'] = df_telegram_concat['text'].apply(remove_links).apply(remove_emojis)
@@ -54,4 +54,4 @@ df_telegram_concat.dropna(subset=['text'], inplace=True)
 df_telegram_concat = df_telegram_concat[df_telegram_concat['text'].str.strip() != ""]
 
 # Save the processed dataset
-df_telegram_concat.to_csv("src/machine_learning/BERTopic/df_telegram_concat.csv", index=False, encoding='UTF-8')
+df_telegram_concat.to_csv("src/machine_learning/BERTopic/df_telegram_concat_switzerland.csv", index=False, encoding='UTF-8')
