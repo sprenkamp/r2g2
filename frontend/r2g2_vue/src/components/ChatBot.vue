@@ -1,275 +1,340 @@
 <!-- ChatBot.vue -->
 
 <template>
-    <div class="chatbox-container">
-        <div class="container">
-            <h1>
-              Ai Chat Bot
-            </h1>
-            <div class="messageBox mt-8">
-                <template v-for="(message, index) in messages" :key="index">
-                    <div :class="message.from == 'user' ? 'messageFromUser' : 'messageFromChatGpt'">
-                        <div :class="message.from == 'user' ? 'userMessageWrapper' : 'chatGptMessageWrapper'">
-                            <div :class="message.from == 'user' ? 'userMessageContent' : 'chatGptMessageContent'">{{ message.data }}</div>
-                        </div>
-                    </div>
-                </template>
-                <div class="buttonContainer">
-                  <div class="buttonRow"> 
-                    <el-button type="success" plain class="chatButton" @click="sendQuestion('question template 1')">Question 1</el-button>
-                    <el-button type="success" plain class="chatButton" @click="sendQuestion('question template 2')">Question 2</el-button>
+  <div class="container">
+      <h1>
+        <Icon icon="carbon:chat-bot" height="48"/>
+        Chat Bot
+      </h1>
+      <div class="messageBox mt-8">
+          <template v-for="(message, index) in messages" :key="index">
+              <div :class="message.from == 'user' ? 'messageFromUser' : 'messageFromChatGpt'">
+                  <div :class="message.from == 'user' ? 'userMessageWrapper' : 'chatGptMessageWrapper'">
+                      <div :class="message.from == 'user' ? 'userMessageContent' : 'chatGptMessageContent'">{{ message.data }}</div>
                   </div>
-                  <div class="buttonRow"> 
-                    <el-button type="success" plain class="chatButton" @click="sendQuestion('question template 3')">Question 3</el-button>
-                    <el-button type="success" plain class="chatButton" @click="sendQuestion('question template 4')">Question 4</el-button>
-                  </div>
-                </div>
               </div>
-            <div class="inputContainer">
-                <el-autocomplete
-                  v-model="currentMessage"
-                  :fetch-suggestions="querySearch"
-                  clearable
-                  placeholder="Ask me about the data"
-                  @select="handleSelect"
-                />
-                <button
-                    @click="sendMessage(currentMessage)"
-                    class="askButton"
-                >
-                    Ask
-                </button>
-                <button class="askButton" @click="clearChatHistory">Clean</button>
+          </template>
+          <div class="buttonContainer">
+            <div class="buttonRow"> 
+              <el-button type="primary" :icon="Apple" plain class="chatButton" @click="sendQuestion('question template 1')">Question 1</el-button>
+              <el-button type="primary" :icon="Pear" plain class="chatButton" @click="sendQuestion('question template 2')">Question 2</el-button>
             </div>
+            <div class="buttonRow"> 
+              <el-button type="primary" :icon="Watermelon" plain class="chatButton" @click="sendQuestion('question template 3')">Question 3</el-button>
+              <el-button type="primary" :icon="Lollipop" plain class="chatButton" @click="sendQuestion('question template 4')">Question 4</el-button>
+            </div>
+          </div>
         </div>
-    </div>
+      <div class="inputContainer">
+          <el-autocomplete
+            v-model="currentMessage"
+            :fetch-suggestions="querySearch"
+            clearable
+            placeholder="Ask me about the data"
+            @select="handleSelect"
+          />
+          <button
+              @click="sendMessage(currentMessage)"
+              class="askButton"
+          >
+              Ask
+          </button>
+          <button class="askButton" @click="clearChatHistory">Clean</button>
+      </div>
+  </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import {ref, reactive} from 'vue'
 import axios from 'axios';
-import { Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
-export default {
-  name: 'ChatBox',
-  data() {
-    return {
-      currentMessage: '',
-      messages: [],
-      tempHistory: [], // Temporary history storage
-      tempHistoryIndex: 0,
-      questions:[],
-    };
-  },
-  methods: {
-    async sendMessage(message) {
-      this.messages.push({
-        from: 'user',
-        data: message,
-      });
-      await axios
-        .post('http://localhost:3000/chatbot', {
-          message: message,
-        })
-       .then((response) => {
-        this.messages.push({
-            from: 'chatGpt',
-            data: response.data.data, // Access the 'data' property of the response object
-        });
-        });
-    },
-    async clearChatHistory() {
-      this.messages = [];
-    },
-    async querySearch(queryString, cb) {
-      const results = queryString ? this.questions.filter(this.createFilter(queryString)) : this.questions
-      cb(results)
-    },
-    handleSelect(item) {
-      console.log(item)
-    },
-    createFilter(queryString) {
-      return (questions) =>
-        questions.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
-    },
-    sendQuestion(question) {
-      this.currentMessage = question;
-      this.sendMessage(question);
-    }
-  },
-  async mounted() {
-    this.questions = [
-      { value: 'hello'},
-      { value: 'sample'},
-      { value: 'question template 1'},
-      { value: 'question template 2'},
-      { value: 'question template 3'},
-      { value: 'question template 4'},
-      // ... other data items ...
-    ];
-  },
+import { Apple, Watermelon, Pear, Lollipop} from '@element-plus/icons-vue'
+import { Icon } from '@iconify/vue';
+
+interface Message {
+from: string;
+data: string;
+}
+
+const currentMessage = ref('');
+const messages = ref<Message[]>([]);
+const questions = ref<{ value: string }[]>([]);
+
+const sendMessage = async (message: string) => {
+messages.value.push({
+from: 'user',
+data: message,
+});
+try {
+const response = await axios.post('http://localhost:3000/chatbot', {
+message: message,
+});
+messages.value.push({
+from: 'chatGpt',
+data: response.data.data,
+});
+} catch (error) {
+console.error(error);
+}
 };
+
+const clearChatHistory = () => {
+messages.value.splice(0, messages.value.length);
+};
+
+const querySearch = (queryString) => {
+const results = queryString ? questions.value.filter(createFilter(queryString)) : questions.value;
+return results;
+};
+
+const handleSelect = (item) => {
+console.log(item);
+};
+
+const createFilter = (queryString) => {
+return (questions) =>
+questions.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+};
+
+const sendQuestion = (question) => {
+currentMessage.value = question;
+sendMessage(question);
+};
+
+questions.value = [
+{ value: 'hello' },
+{ value: 'sample' },
+{ value: 'question template 1' },
+{ value: 'question template 2' },
+{ value: 'question template 3' },
+{ value: 'question template 4' },
+// ... other data items ...
+];
+// export default {
+//   name: 'ChatBox',
+//   data() {
+//     return {
+//       currentMessage: '',
+//       messages: [],
+//       tempHistory: [], // Temporary history storage
+//       tempHistoryIndex: 0,
+//       questions:[],
+//       apple: Apple,
+//       pear: Pear,
+//       watermelon: Watermelon,
+//       lollipop: Lollipop,
+//     };
+//   },
+//   components: {
+//     Apple, Watermelon, Pear, Lollipop,
+//   },
+//   methods: {
+//     async sendMessage(message) {
+//       this.messages.push({
+//         from: 'user',
+//         data: message,
+//       });
+//       await axios
+//         .post('http://localhost:3000/chatbot', {
+//           message: message,
+//         })
+//        .then((response) => {
+//         this.messages.push({
+//             from: 'chatGpt',
+//             data: response.data.data, // Access the 'data' property of the response object
+//         });
+//         });
+//     },
+//     async clearChatHistory() {
+//       this.messages = [];
+//     },
+//     async querySearch(queryString, cb) {
+//       const results = queryString ? this.questions.filter(this.createFilter(queryString)) : this.questions
+//       cb(results)
+//     },
+//     handleSelect(item) {
+//       console.log(item)
+//     },
+//     createFilter(queryString) {
+//       return (questions) =>
+//         questions.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0;
+//     },
+//     sendQuestion(question) {
+//       this.currentMessage = question;
+//       this.sendMessage(question);
+//     }
+//   },
+//   async mounted() {
+//     this.questions = [
+//       { value: 'hello'},
+//       { value: 'sample'},
+//       { value: 'question template 1'},
+//       { value: 'question template 2'},
+//       { value: 'question template 3'},
+//       { value: 'question template 4'},
+//       // ... other data items ...
+//     ];
+//   },
+// };
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
 
-.chatbox-container {
-  position: flex;
-  bottom: 10px;
-  right: 10px;
-  z-index: 1000;
-}
 .container {
-  width: 550px;
-  height: 1000px;
-  background-color: rgb(176, 246, 146);
-  border-radius: 8px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  font-family: 'Roboto', sans-serif;
-  border-radius: 18px;
+width: auto;
+height: 700px;
+background-color: rgb(255, 255, 255);
+border-radius: 8px;
+border-color: #000000;
+box-shadow: 0 0 40px rgba(0, 0, 0, 1);
+display: flex;
+flex-direction: column;
+overflow: hidden;
+font-family: 'Roboto', sans-serif;
+border-radius: 18px;
+position: flex;
+bottom: 10px;
+right: 10px;
+flex-grow: 1;
 }
 h1 {
-  font-size: 28px;
-  font-weight: 500;
-  text-align: center;
-  color: #222;
-  padding: 16px;
-  margin: 0;
-  background-color: #7bef5e;
-  border-bottom: 1px solid #e7e7e7;
+font-size: 28px;
+font-weight: 500;
+text-align: center;
+color: #ffffff;
+padding: 16px;
+margin: 0;
+background-color: #a0cfff;
+border-bottom: 1px solid #e7e7e7;
 }
 .messageBox {
-  padding: 10px;
-  flex-grow: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+padding: 10px;
+flex-grow: 1;
+overflow-y: auto;
+display: flex;
+flex-direction: column;
+gap: 12px;
 }
 .messageFromUser,
 .messageFromChatGpt {
-  display: flex; }
+display: flex; }
 .messageBox {
-  max-height: 1000px;
-  overflow-y: auto;
-  padding: 0 16px;
-  border-top: 1px solid #4afe5f;
-  border-bottom: 1px solid #42ff25;
-  flex-grow: 1;
+max-height: 1000px;
+overflow-y: auto;
+padding: 0 16px;
+border-top: 1px solid #000000;
+border-bottom: 1px solid #000000;
+flex-grow: 1;
 }
 .messageFromUser,
 .messageFromChatGpt {
-  display: flex;
-  margin-bottom: 8px;
+display: flex;
+margin-bottom: 8px;
 }
 .userMessageWrapper,
 .chatGptMessageWrapper {
-  display: flex;
-  flex-direction: column;
+display: flex;
+flex-direction: column;
 }
 .userMessageWrapper {
-  align-self: flex-end;
+align-self: flex-end;
 }
 
 .chatGptMessageWrapper {
-  align-self: flex-start;
+align-self: flex-start;
 }
 .userMessageContent,
 .chatGptMessageContent {
-  max-width: 60%;
-  padding: 8px 12px;
-  border-radius: 18px;
-  margin-bottom: 2px;
-  font-size: 20px;
-  line-height: 1.4;
+max-width: 60%;
+padding: 8px 12px;
+border-radius: 18px;
+margin-bottom: 2px;
+font-size: 20px;
+line-height: 1.4;
 }
 .userMessageContent {
-  background-color: #1877F2;
-  color: white;
-  border-top-left-radius: 0;
+background-color: #409EFF;
+color: white;
+border-top-left-radius: 0;
 }
 .chatGptMessageContent {
-  background-color: #EDEDED;
-  color: #222;
-  border-top-right-radius: 0;
+background-color: #EDEDED;
+color: #000000;
+border-top-right-radius: 0;
 }
 .chatGptMessageTimestamp {
-  font-size: 10px;
-  color: #999;
-  margin-top: 2px;
-  align-self: flex-start;
+font-size: 10px;
+color: #999;
+margin-top: 2px;
+align-self: flex-start;
 }
 
 .userMessageTimestamp {
-  align-self: flex-end;
+align-self: flex-end;
 }
 .inputContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  background-color: #7bef5e;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 8px;
+background-color: #ffffff;
 }
 .el-autocomplete {
-  flex-grow: 1;
-  border: none;
-  outline: none;
-  padding: 12px;
-  font-size: 18px;
-  background-color: rgb(255, 255, 255);
-  border-radius: 24px;
-  margin-right: auto;
+flex-grow: 1;
+border: none;
+outline: none;
+padding: 12px;
+font-size: 18px;
+background-color: rgb(255, 255, 255);
+border-radius: 24px;
+margin-right: auto;
 }
 .askButton {
-  background-color: #1877F2;
-  color: white;
-  font-size: 16px;
-  padding: 8px 16px;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  border-radius: 20px;
-  transition: background-color 0.3s ease-in-out;
-  margin-left: 20px;
+background-color: #a0cfff;
+color: rgb(255, 255, 255);
+font-size: 16px;
+padding: 8px 16px;
+border: none;
+outline: none;
+cursor: pointer;
+border-radius: 20px;
+transition: background-color 0.3s ease-in-out;
+margin-left: 20px;
 }
 .askButton:hover {
-  background-color: #145CB3;
+background-color: #ffffff;
 }
 @media (max-width: 480px) {
-  .container {
-    width: 100%;
-    max-width: none;
-    border-radius: 0;
-  }
+.container {
+width: 100%;
+max-width: none;
+border-radius: 0;
+}
 }
 .messageBox {
-  padding: 16px;
-  flex-grow: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+padding: 16px;
+flex-grow: 1;
+overflow-y: auto;
+display: flex;
+flex-direction: column;
+gap: 12px;
 }
 
 .messageFromUser,
 .messageFromChatGpt {
-  display: flex;
+display: flex;
 }
-
 .buttonContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px;
-  margin-top: auto;
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 8px;
+margin-top: auto;
 }
-
 .buttonRow {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 8px;
+display: flex;
+justify-content: center;
+margin-bottom: 8px;
 }
 
 </style>

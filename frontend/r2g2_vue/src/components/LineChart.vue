@@ -23,6 +23,9 @@ export default {
     chartOptions: {
       type: Object,
       default: () => ({
+        // maintainAspectRatio: false,
+        // width: 10,
+        // height: 10,
         responsive: true,
         scales: {
           x: {
@@ -51,11 +54,11 @@ export default {
         plugins: {
           title: {
             display: true,
-            text: 'Cluster over time on News within',
+            text: 'Title',
             fontSize: 20,
           },
           legend: {
-            position: 'right'
+            position: 'top'
           },
         },
       })
@@ -71,9 +74,10 @@ export default {
         ...this.chartData,
         datasets: this.chartData.datasets.map((dataset) => ({
           ...dataset,
+          tension: 0.3,
           data: dataset.data.map((value, index) => ({
             x: dataset.data[index].x,
-            y: value.x === this.selectedState ? value.y : 0, // 如果州匹配则保留值，否则置零
+            y: value.x === this.selectedState ? value.y : 0,
           })),
         })),
       };

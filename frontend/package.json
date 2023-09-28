@@ -1,15 +1,11 @@
 {
-  "devDependencies": {
-    "@vue-leaflet/vue-leaflet": "^0.10.1",
-    "leaflet": "^1.9.4",
-    "unplugin-element-plus": "^0.8.0"
-  },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.1.0",
     "axios": "^1.4.0",
+    "body-parser": "^1.20.2",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "mongodb": "^5.7.0"
+    "mongodb": "^5.7.0",
+    "openai": "^4.10.0"
   }
 }
