@@ -20,6 +20,7 @@ cd frontend/mongoDb-backend
 cd frontend/r2g2_vue
 ```
 | Path and Name | Function |
+| ------- | ------- |
 | /chatgpt-backend | code to connect openAi and our chatbot api |
 | /mongoDB-backend |code to connect mongoDB database |
 | /r2g2_vue        | code to build an interface with vue3 |
@@ -30,6 +31,7 @@ cd frontend/r2g2_vue
 cd frontend/r2g2_vue/src
 ```
 | Path and Name | Function |
+| ------- | ------- |
 | /assets | store basic style |
 | /components | store all website components |
 | /data | store used data file |
