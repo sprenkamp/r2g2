@@ -18,7 +18,7 @@ ATLAS_TOKEN = os.environ["ATLAS_TOKEN"]
 ATLAS_USER = os.environ["ATLAS_USER"]
 
 @app.post("/query")
-def query(chat_history, time, location):
+def query(chat_history):
     
     #MongoDB part start
 
@@ -30,10 +30,6 @@ def query(chat_history, time, location):
     
     #time and location from vue GUI is used here to lower the number of embeddings used (waiting for DB cahnges)
     col = db["telegram"]
-    DBfilter = {"country": f"{location}",
-                "update_time": f"{time}"}
-    
-    col = col.find(DBfilter)
 
     #MongoDB part end
 
