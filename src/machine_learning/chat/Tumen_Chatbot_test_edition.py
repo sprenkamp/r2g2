@@ -68,8 +68,9 @@ chain = ConversationalRetrievalChain.from_llm(
 chat_history = []
 
 chat_history = [chat_history]
-query = input("Enter Your Query:")
-answer = chain({"question": query, "chat_history": chat_history})
-print(answer["source_documents"][0])
-chat_history.append((query, answer["answer"]))
-print(answer["answer"])
+while True:
+    query = input("Enter Your Query:")
+    answer = chain({"question": query, "chat_history": chat_history})
+    print(answer["source_documents"][0])
+    chat_history.append((query, answer["answer"]))
+    print(answer["answer"])
