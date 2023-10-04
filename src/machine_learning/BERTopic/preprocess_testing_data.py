@@ -2,11 +2,17 @@
 # Number of data entries with cluster_id as -1: 2229067 
 # Number of data entries with cluster_id not equal to -1: 369609. 
 # (labelled topic : unlabelled topic = 4：25）
-# import file: df_telegram_test.csv, export file: df_telegram_concat.csv
+# import file: df_telegram_test.csv, export file: df_telegram_concat.csv, the name of output could be different due to the sample needed.
+# In our case, we only extract 100,000 labelled data.
+
 import pandas as pd
 from pymongo import MongoClient
 import pandas as pd
 from tqdm import tqdm
+import nltk
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+from nltk.corpus import stopwords
+import re
 
 # Create a Cluster Mapping by translating the dictionary into numeric representation:
 #{'Volunteering': 0, 'Integration': 1, 'Accommodation': 2, 
@@ -139,29 +145,61 @@ print(cluster_mapping)
 
 # Load an existing CSV, map the cluster names to the corresponding cluster IDs
 # Change it into your own local path if need to run, several typos of cluster_name is modified(e.g., accomodation, consulate, Public Transport and Service, Transport personal Car..)in original doc, please refer to the above key of dictionary
-file_path = r"C:\Users\rocco\Documents\project0809\r2g2\src\machine_learning\BERTopic\df_telegram_test.csv" 
+file_path = "src/machine_learning/BERTopic/df_telegram_test.csv" 
 df = pd.read_csv(file_path, encoding='UTF-8')
 df['cluster_id'] = df['cluster_name'].map(cluster_mapping)
-df.to_csv(file_path, index=False)
+# df.to_csv(file_path, index=False)
 
 # Fetch Data from MongoDB
 client = MongoClient("mongodb+srv://refugeeukraineai_test:FKFSPyoomgVAkufs@cluster0.fcobsyq.mongodb.net/")
 db = client.get_database("scrape")
 collection = db["telegram"]
 
-data = list(tqdm(collection.find(), total=collection.count_documents({})))
+# swiss_data_cursor = collection.find({"country": "Switzerland"}, {"messageText": 1, "_id": 0}).limit(500000)
+# swiss_data_list = list(tqdm(swiss_data_cursor, total=min(500000, collection.count_documents({"country": "Switzerland"}))))
 
-df_mongo = pd.DataFrame(data)
+# Fetch only 'messageText' from data where the country is Switzerland
+swiss_data_cursor = collection.find({"country": "Switzerland"}, {"messageText": 1, "_id": 0})
+swiss_data_list = list(tqdm(swiss_data_cursor, total=collection.count_documents({"country": "Switzerland"})))
 
-df_mongo = df_mongo[['messageText']]
-df_mongo.columns = ['text']
+# Convert the fetched data to DataFrame
+df_swiss = pd.DataFrame(swiss_data_list)
+df_swiss.columns = ['text']
+df_swiss['cluster_name'] = None
+df_swiss['cluster_id'] = -1
 
-df_mongo['cluster_name'] = None
-df_mongo['cluster_id'] = -1
+#Extract 100000 data in sequence from labelled dataset
+df_subset = df.head(100000)
 
-file_path = r"C:\Users\rocco\Documents\project0809\r2g2\src\machine_learning\BERTopic\df_telegram_test.csv"
-df_telegram = pd.read_csv(file_path, encoding='UTF-8')
+# Concatenate the Switzerland data with the existing DataFrame and save it to a new CSV file
+df_combined = pd.concat([df_subset, df_swiss], ignore_index=True)
 
-df_combined = pd.concat([df_telegram, df_mongo], ignore_index=True)
+def remove_links(text):
+    return re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)
 
-df_combined.to_csv(r"C:\Users\rocco\Documents\project0809\r2g2\src\machine_learning\BERTopic\df_telegram_concat.csv", index=False)
+def remove_emojis(text):
+    # The pattern will recognize most of the emojis in the text
+    emoji_pattern = re.compile(pattern = "["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F700-\U0001F77F"  # alchemical symbols
+        u"\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
+        u"\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
+        u"\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
+        u"\U0001FA00-\U0001FA6F"  # Chess Symbols
+        u"\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
+        u"\U00002702-\U000027B0"  # Dingbats
+        u"\U000024C2-\U0001F251"  
+        "]+", flags = re.UNICODE)
+    return emoji_pattern.sub(r'', text)
+
+# Apply preprocessing
+df_combined['text'] = df_combined['text'].apply(remove_links).apply(remove_emojis)
+
+# Drop rows where 'text' column is either NaN or empty string
+df_combined.dropna(subset=['text'], inplace=True)
+df_combined = df_combined[df_combined['text'].str.strip() != ""]
+
+# Save the processed dataset, to note, 0.65M includeds all the swiss data.
+df_combined.to_csv("src/machine_learning/BERTopic/df_telegram_concat_switzerland_0.65M_v2.csv", index=False, encoding='UTF-8')
