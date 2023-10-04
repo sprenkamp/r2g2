@@ -2,11 +2,29 @@ import os
 import pandas as pd
 from bertopic import BERTopic
 from sklearn.feature_extraction.text import CountVectorizer
-from stoppingword_process import stopWords
 from cuml.cluster import HDBSCAN
 from cuml.manifold import UMAP
 import numpy as np
 from bertopic.vectorizers import ClassTfidfTransformer
+import nltk
+from nltk.corpus import stopwords
+
+# Download required NLTK resources
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('stopwords')
+
+# Initialize an empty list to hold the stopwords
+stopWords = []
+
+# Define and extend the stopwords list
+languages = ['english', 'german', 'french', 'italian', 'russian']
+for lang in languages:
+    stopWords.extend(stopwords.words(lang)) 
+# Adding Ukrainian stopwords
+with open("src/machine_learning/BERTopic/stopwords_ua.txt", encoding='utf-8') as file:
+    ukrstopWords = [line.rstrip() for line in file]  # Reading lines from file and storing them in a list
+    stopWords.extend(ukrstopWords) 
 
 class OurBERTopicModel:
     def __init__(self, output_folder):
@@ -14,19 +32,21 @@ class OurBERTopicModel:
         if not os.path.exists(self.output_folder):
             os.makedirs(self.output_folder)
     
-    def fit_model(self, docs, labels):
-        umap_model = UMAP(n_neighbors=200, n_components=6, metric='cosine', low_memory=True)
-        hdbscan_model = HDBSCAN(min_cluster_size=500, metric='euclidean', prediction_data=True)
+    def fit_model(self, docs, labels): 
+        umap_model = UMAP(n_neighbors=15, n_components=10, metric='cosine', low_memory=True)
+        hdbscan_model = HDBSCAN(min_cluster_size=300, metric='euclidean', prediction_data=True)
         vectorizer_model = CountVectorizer(ngram_range=(1, 2), stop_words=list(stopWords), min_df=10)
         ctfidf_model = ClassTfidfTransformer(reduce_frequent_words=True)
         self.model = BERTopic(embedding_model="paraphrase-multilingual-MiniLM-L12-v2", 
                               language="multilingual",
-                              verbose=True, 
-                              nr_topics=25,
+                              verbose=True,  
+                              nr_topics="auto",
                               umap_model=umap_model, 
                               hdbscan_model=hdbscan_model,
                               vectorizer_model=vectorizer_model,
-                              ctfidf_model=ctfidf_model) 
+                              ctfidf_model=ctfidf_model,
+                              calculate_probabilities=False
+                              )
         self.model.fit(docs, y=labels)
         self.save_results()
         self.write_representative_docs_df()
@@ -51,10 +71,10 @@ class OurBERTopicModel:
         self.model.get_topic_info().to_csv(f"{self.output_folder}/topic_info.csv")
 
 if __name__ == "__main__":
-    df_telegram_concat = pd.read_csv("src/machine_learning/BERTopic/df_telegram_concat.csv", encoding='UTF-8')
+    df_telegram_concat = pd.read_csv("src/machine_learning/BERTopic/df_telegram_concat_switzerland_0.55M.csv", encoding='UTF-8')
     docs = np.array(df_telegram_concat['text'].tolist(), dtype=object)
     labels = np.array(df_telegram_concat['cluster_id'].tolist(), dtype=int)
     
-    output_folder = "src/machine_learning/BERTopic/Result2"
+    output_folder = "src/machine_learning/BERTopic/Result_swiss0.55M_auto_n_neighbors=25"
     bertopic_model = OurBERTopicModel(output_folder)
     bertopic_model.fit_model(docs, labels)
