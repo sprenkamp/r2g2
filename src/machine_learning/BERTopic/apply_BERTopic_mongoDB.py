@@ -18,7 +18,7 @@ def predict_and_update(model_path):
         "mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(
             ATLAS_USER, ATLAS_TOKEN))
 
-    db = client["test"]
+    db = client["scrape"]
     col = db["telegram"]
 
     # Query
