@@ -19,4 +19,5 @@ We are thinking of using docker to make all of the APIs to work together
 |     state     | string |        'null'         |                      e.g. 'Zurich'                      |   
 |     query     | string |        'null'         | current query. e.g. 'Can I get free clothes in Zurich?' |   
 | query_history | array  |          []           |             conatins all historical query.              |   
+
 if users do not select start_date/end_date/country/state, use 'null' as parameters to call API 
