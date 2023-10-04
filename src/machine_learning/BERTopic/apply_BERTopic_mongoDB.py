@@ -53,5 +53,5 @@ def predict_and_update(model_path):
     client.close()
 
 # Example usage
-model_path = "path_to_your_model"
+model_path = "kdot/BERTopicTelegramAnalysis"
 predict_and_update(model_path)
