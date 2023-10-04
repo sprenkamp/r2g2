@@ -1,4 +1,3 @@
-import argparse
 from pymongo import MongoClient
 import pandas as pd
 from bertopic import BERTopic
@@ -53,9 +52,6 @@ def predict_and_update(model_path):
     
     client.close()
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Predict and update MongoDB records using a pre-trained BERTopic model.')
-    parser.add_argument('-m','--model_path', type=str, help='Path to the pre-trained BERTopic model.')
-
-    args = parser.parse_args()
-    predict_and_update(args.model_path)
+# Example usage
+model_path = "path_to_your_model"
+predict_and_update(model_path)
