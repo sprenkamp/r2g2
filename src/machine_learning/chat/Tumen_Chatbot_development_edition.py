@@ -77,7 +77,7 @@ def query(start_date, end_date, country, state, query, chat_history):
     client = MongoClient(
         "mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(
             ATLAS_USER, ATLAS_TOKEN))
-    db_name, collection_name = "test", "telegram"
+    db_name, collection_name = "scrape", "telegram"
     collection = client[db_name][collection_name]
 
     api_key = os.environ.get('OPENAI_API_KEY')
@@ -129,5 +129,8 @@ def query(start_date, end_date, country, state, query, chat_history):
 
     chat_history = [chat_history]
     answer = chain({"question": query, "chat_history": chat_history})
-    print(answer["source_documents"][0])
+    print(answer["source_documents"][0].metadata['state'])
+    print(answer["source_documents"][0].metadata['country'])
+    print(answer["source_documents"][0].metadata['messageDatetime'])
+    print(answer["source_documents"][0].page_content)
     return answer["answer"]
