@@ -11,8 +11,13 @@ from langchain.memory import ConversationBufferMemory
 from langchain.vectorstores import MongoDBAtlasVectorSearch
 
 #TODO:
-# 1. Solve bug MongoDBAtlasVectorSearch
+# 1. Solve bug pymongo.errors.OperationFailure: 
+# $vectorSearch is not allowed or the syntax is incorrect, see the Atlas documentation for more information, full error: {'ok': 0, 'errmsg': '$vectorSearch is not allowed or the syntax is incorrect, 
+# see the Atlas documentation for more information', 'code': 8000, 'codeName': 'AtlasError'}
 # 2. Add cluster to parse_parameters and use it in MongoDBAtlasVectorSearch
+# 3. Simplify code I feel we don't need all these langchain functions
+# 4. Write dockerfile and run app in docker
+# 5. Think about hosting options
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -119,7 +124,9 @@ async def query(request: Request):
     "chat_history": [["some answer", "some query"]]
     }
     """
-    
+
+    print("Starting /query endpoint...")  # Debug: Indicate the start of the endpoint
+
     # Get data from the incoming request
     data = await request.json()
     start_date = data.get("start_date", "null")
@@ -128,12 +135,14 @@ async def query(request: Request):
     state = data.get("state", "null")
     query_text = data.get("query")
     chat_history_list = data.get("chat_history", [])
-
+    print(f"Received Data: Start Date: {start_date}, End Date: {end_date}, Country: {country}, State: {state}, Query: {query_text}")
+    
     # Error handling: Ensure a query is provided
     if not query_text:
         raise HTTPException(status_code=400, detail="Query text not provided in the request.")
 
     # Initialize MongoDB Connection
+    print("Initializing MongoDB connection...") 
     client = MongoClient(
         "mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(
             ATLAS_USER, ATLAS_TOKEN))
@@ -145,6 +154,7 @@ async def query(request: Request):
         raise HTTPException(status_code=500, detail="OpenAI API key not found in environment variables.")
 
     # Set up embeddings, vectors, and memory for the retrieval chain
+    print("Setting up embeddings, vectors, and memory...")
     embeddings = OpenAIEmbeddings(openai_api_key=api_key)
     vectors = MongoDBAtlasVectorSearch(
         collection=collection, text_key='messageText',
@@ -195,10 +205,18 @@ async def query(request: Request):
     print(answer["source_documents"][0].page_content)
 
     # Add the new Q&A pair to the chat history and return the results
+    print("Returning the response...")
     chat_history_list.append((query_text, answer["answer"]))
     return {"answer": answer["answer"], "chat_history": chat_history_list}
+
+#solely for test & debug
+@app.get("/test")
+def test_endpoint():
+    print("Test endpoint called!")
+    return {"message": "Test successful"}
+
 
 # Run the FastAPI app using uvicorn
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8080)
