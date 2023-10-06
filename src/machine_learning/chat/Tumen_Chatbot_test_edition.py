@@ -10,9 +10,6 @@ from langchain.memory import ConversationBufferMemory
 from langchain.vectorstores import MongoDBAtlasVectorSearch
 
 from pymongo import MongoClient
-from fastapi import FastAPI
-
-app = FastAPI()
 
 ATLAS_TOKEN = os.environ["ATLAS_TOKEN"]
 ATLAS_USER = os.environ["ATLAS_USER"]
@@ -71,6 +68,9 @@ chat_history = [chat_history]
 while True:
     query = input("Enter Your Query:")
     answer = chain({"question": query, "chat_history": chat_history})
-    print(answer["source_documents"][0])
-    chat_history.append((query, answer["answer"]))
+    print(answer["source_documents"][0].metadata['state'])
+    print(answer["source_documents"][0].metadata['country'])
+    print(answer["source_documents"][0].metadata['messageDatetime'])
+    print(answer["source_documents"][0].page_content)
     print(answer["answer"])
+    chat_history.append((query, answer["answer"]))
