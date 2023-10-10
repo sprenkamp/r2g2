@@ -1,14 +1,11 @@
-BERTopic_Telegram_Analysis
+# BERTopic_Telegram_Analysis
 
-Installation
+Leverage the BERTopic framework to generate easily interpretable topics from vast datasets originating from 32 public Telegram channels used by Ukrainian refugees. This project aims to study the refugees' needs within Switzerland.
+
+## Installation
 To utilize this model, install BERTopic via pip:
 pip install -U bertopic
 
-Here's how you can use the model:
-
-python
-Copy code
-from bertopic import BERTopic
 topic_model = BERTopic.load("kdot/BERTopicTelegramAnalysis")
 topic_info = topic_model.get_topic_info()
 
@@ -91,6 +88,7 @@ self.model = BERTopic(
     vectorizer_model=vectorizer_model,
     calculate_probabilities=False
 )
+
 Performance Enhancements
 Performance enhancements were achieved by setting low_memory=true and calculate_probabilities=False. During the UMAP step, n_neighbours was truncated to 10 for smoother operations to combat the dominance of non-essential data like timestamps or ads in leading clusters. Relevant Russian keywords were appended to our stopwords_ua.txt list, applied post-embedding and clustering.
 
