@@ -3,7 +3,12 @@
 <template>
   <div class="navigation">
     <Navigation/>
-    <el-button @click="toggleSidebar" :icon="sidebarIcon"></el-button>
+    <el-button @click="toggleSidebar">
+      <Icon
+        :icon="showSidebar ? 'material-symbols:play-arrow-outline' : 'material-symbols:play-arrow-outline'"
+        :rotate="showSidebar ? 2 : 0"
+      />
+    </el-button>
   </div>
   <el-container class="layout-container">
     <el-aside width="300px" v-show="showSidebar">
@@ -64,7 +69,8 @@
         <!-- 第一行第三列 时间轴/third column in first row, time slider -->
         <el-col :span="8"><div class="grid-content ep-bg-purple" />
           <h3>{{$t('Choose date range of interest')}}</h3>
-          <el-slider v-model="selectedDate" :min="minDate" :max="maxDate" range @change="handleSliderChange"/>
+          <DatePicker v-if="minDate !== null && maxDate !== null" :minDate="minDate" :maxDate="maxDate" @selected-date="handleSelectedDate"/>
+          <!-- <el-slider v-model="selectedDate" :min="minDate" :max="maxDate" range @change="handleSliderChange"/> -->
         </el-col>
       </el-row>
       <!-- 第二行 空行/second row, empty line -->
@@ -103,7 +109,7 @@
         trigger="hover"
         content="I'm a chatbot, try to ask me some questions.">
         <template #reference>
-          <el-button round @click="drawer = true">
+          <el-button round @click="toggleChatbot">
             <Icon icon="material-symbols:robot-2-outline" width="56" height="56" :horizontalFlip="true" />
             <Icon icon="humbleicons:chat" width="36" height="36"/>
           </el-button>
@@ -111,11 +117,11 @@
       </el-popover>
     </el-container>
   </el-affix>
-  <el-drawer v-model="drawer" :with-header="false">
-      <template #default>
-        <ChatBot/>
-      </template>
-  </el-drawer>
+  <el-affix position="bottom" :offset="750">
+    <el-container class="chatbot-container">
+      <ChatBot v-show="showChatbot"/>
+    </el-container>
+  </el-affix>
 </template>
 
 <script>
@@ -123,6 +129,7 @@ import MapComponent from './MapComponent.vue';
 import LineChart from './LineChart.vue';
 import ChatBot from './ChatBot.vue';
 import Navigation from './Navigation.vue';
+import DatePicker from './DatePicker.vue';
 import {
     ArrowRight as arrowright,
     ArrowLeft as arrowleft
@@ -135,6 +142,7 @@ export default {
     LineChart,
     ChatBot,
     Navigation,
+    DatePicker,
     arrowright,
     arrowleft,
     Icon,
@@ -166,6 +174,7 @@ export default {
       },                       // define data for line chart
       filteredData: [],        // store filtered data
       drawer: false,
+      showChatbot: false,
     };
   },
   async created(){
@@ -187,12 +196,9 @@ export default {
     // get the min,max date as well as date range in type 1645660800000
     const dateData = await this.$getDate(newsPath);
     this.dateOptions = dateData;
-    this.$getDate(newsPath)
-    .then(() => {
-      this.minDate = new Date(this.$minDate).getTime();
-      this.maxDate = new Date(this.$maxDate).getTime();
-      this.selectedDate = [this.minDate, this.maxDate];
-    });
+    this.minDate = this.dateOptions[0];
+    this.maxDate = this.dateOptions[this.dateOptions.length - 1];
+    this.selectedDate = [this.minDate, this.maxDate];
 
     // Load data and draw chart
     this.isLoading = true;
@@ -258,10 +264,18 @@ export default {
       });
     },
 
-    async handleSliderChange(values) {
-      const [minValue, maxValue] = values;
-      this.selectedDateRange = await this.$convertTimetoString(values);
-      this.dateOptions = this.selectedDateRange;
+    // async handleSliderChange(values) {
+    //   const [minValue, maxValue] = values;
+    //   this.selectedDateRange = await this.$convertTimetoString(values);
+    //   this.dateOptions = this.selectedDateRange;
+    //   this.updateChartData();
+    // },
+
+    async handleSelectedDate(value) {
+      if (value === null) {
+        return;
+      }
+      this.dateOptions = await this.$convertTimetoString(value);
       this.updateChartData();
     },
 
@@ -307,6 +321,9 @@ export default {
     toggleSidebar() {
       this.showSidebar = !this.showSidebar;
       this.sidebarIcon = this.showSidebar ? arrowleft : arrowright;
+    },
+    toggleChatbot() {
+      this.showChatbot = !this.showChatbot;
     },
   },
 };
@@ -383,5 +400,12 @@ export default {
 .chatbot {
   justify-content: center;
   /* align-items: center; */
+}
+.chatbot-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 25%;
+  z-index: 999;
 }
 </style>

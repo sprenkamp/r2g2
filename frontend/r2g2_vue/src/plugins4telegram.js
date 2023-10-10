@@ -1,7 +1,7 @@
-import api from './router/api.js'
+// plugins4telegram.js
 
 // define all functions that will be used
-export default function Plugin(app) {
+const Plugins = function (app, options) {
 
   app.config.globalProperties.$minDate_tele = null;
   app.config.globalProperties.$maxDate_tele = null;
@@ -10,13 +10,6 @@ export default function Plugin(app) {
   app.config.globalProperties.$changeLocale_tele = function(locale) {
     this.$i18n.locale = locale;
   };
-
-  //   // get data from database
-  //   app.config.globalProperties.$getData_tele = async function() {
-  //     const response = await api.getMongoClusterTest();
-  //     const data_tele = response.data;
-  //     return data_tele
-  //   };
 
   // function get all cluster categories
   app.config.globalProperties.$getCluster_tele = async function(data_tele) {
@@ -144,3 +137,4 @@ export default function Plugin(app) {
 
 };
 
+export default Plugins;

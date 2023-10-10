@@ -58,7 +58,7 @@
     </el-menu>
 </template>
   
-<script setup lang="ts">
+<script setup>
 import {reactive} from 'vue'
 import {useDark} from "@vueuse/core";
 import {

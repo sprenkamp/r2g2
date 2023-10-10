@@ -14,7 +14,7 @@ const askToChatGpt = async function (req, res) {
    */
   await openAIInstance
     .createCompletion({
-      model: "text-davinci-003",
+      model: "gpt-3.5-turbo",
       prompt: req.body.message,
       temperature: 0,
       max_tokens: 500,

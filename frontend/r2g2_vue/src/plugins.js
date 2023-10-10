@@ -4,7 +4,7 @@
 import Papa from 'papaparse';
 import * as echarts from 'echarts';
 
-export default function Plugin(app, options) {
+const Plugin = function (app, options) {
   
   app.config.globalProperties.$minDate = null;
   app.config.globalProperties.$maxDate = null;
@@ -106,3 +106,4 @@ export default function Plugin(app, options) {
   }
 };
 
+export default Plugin;

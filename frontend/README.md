@@ -58,14 +58,17 @@ node -v
 
 ```sh
 cd frontend
-npm install axios compression cors express mongodb body-parser openai
+rm -rf node_modules
+rm package-lock.json
+npm install axios compression cors express mongodb body-parser openai dotenv
+npm install
 ```
 
 - For the vue3 development environment:
 
 ```sh
 cd frontend/r2g2_vue
-npm install @element-plus/icons-vue @vue-leaflet/vue-leaflet axios chart.js chartjs-adapter-date-fns echarts element-plus leaflet vue vue-chartjs vue-i18n vue-leaflet vue-loading-overlay vue-router
+npm install @element-plus/icons-vue @vue-leaflet/vue-leaflet axios chart.js chartjs-adapter-date-fns echarts element-plus leaflet vue vue-chartjs vue-i18n vue-leaflet vue-loading-overlay vue-router dotenv
 ```
 
 ## Run our code in development mode
