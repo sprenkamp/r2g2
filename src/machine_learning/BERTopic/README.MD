@@ -7,9 +7,10 @@ To utilize this model, install BERTopic via pip:
 ```bash
 pip install -U bertopic
 ```
+```python
 topic_model = BERTopic.load("kdot/BERTopicTelegramAnalysis")
 topic_info = topic_model.get_topic_info()
-
+```
 ## Topic Overview
 Total topics: 30
 Training documents: 339,650
