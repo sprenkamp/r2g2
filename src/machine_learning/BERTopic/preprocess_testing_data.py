@@ -151,7 +151,7 @@ df['cluster_id'] = df['cluster_name'].map(cluster_mapping)
 # df.to_csv(file_path, index=False)
 
 # Fetch Data from MongoDB
-client = MongoClient("mongodb+srv://refugeeukraineai_test:FKFSPyoomgVAkufs@cluster0.fcobsyq.mongodb.net/")
+client = MongoClient("mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(ATLAS_USER, ATLAS_TOKEN))
 db = client.get_database("scrape")
 collection = db["telegram"]
 
