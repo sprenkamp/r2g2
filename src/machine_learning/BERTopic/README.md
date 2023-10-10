@@ -31,6 +31,7 @@ topic_info = topic_model.get_topic_info()
 | seed_topic_list        | None    |
 | top_n_words            | 10      |
 | verbose                | True    |
+| n_neighbours           | 20      |
 
 ### Framework Versions
 
@@ -100,7 +101,7 @@ self.model = BERTopic(
     calculate_probabilities=False
 )
 ```
-Performance enhancements were achieved by setting low_memory=true and calculate_probabilities=False. During the UMAP step, n_neighbours was truncated to 10 for smoother operations to combat the dominance of non-essential data like timestamps or ads in leading clusters. Relevant Russian keywords were appended to our stopwords_ua.txt list, applied post-embedding and clustering.
+Performance enhancements were achieved by setting low_memory=true and calculate_probabilities=False. During the UMAP step, n_neighbours was truncated to 20 for smoother operations to combat the dominance of non-essential data like timestamps or ads in leading clusters. Relevant Russian keywords were appended to our stopwords_ua.txt list, applied post-embedding and clustering.
 
 ## Transformer Selection
 Our transformer selection was influenced by a comparison between paraphrase-multilingual-mpnet-base-v2 and paraphrase-multilingual-MiniLM-L12-v2. Despite the former's slightly superior performance, its processing speed was thrice as slow, making paraphrase-multilingual-MiniLM-L12-v2 a more efficient choice.
