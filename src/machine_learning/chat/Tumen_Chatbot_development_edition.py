@@ -15,9 +15,11 @@ import datetime
 
 app = FastAPI()
 
+# The local machine should have the following environment variables:
 ATLAS_TOKEN = os.environ["ATLAS_TOKEN"]
 ATLAS_USER = os.environ["ATLAS_USER"]
 
+# This function is used to parse the filters into the format that can be used by MongoDB
 def parse_parameters(start_date, end_date, country, state):
     must_conditions = []
     if state != 'null':
@@ -57,6 +59,7 @@ def parse_parameters(start_date, end_date, country, state):
 
     return conditions
 
+# This function calls the chatbot and returns the answer and prints all the relevant metadata
 @app.post("/query")
 def query(start_date, end_date, country, state, query, chat_history):
     '''
@@ -73,7 +76,7 @@ def query(start_date, end_date, country, state, query, chat_history):
 
     '''
     
-    # initialize
+    # initialize the connection to MongoDB Atlas
     client = MongoClient(
         "mongodb+srv://{}:{}@cluster0.fcobsyq.mongodb.net/".format(
             ATLAS_USER, ATLAS_TOKEN))
@@ -85,20 +88,23 @@ def query(start_date, end_date, country, state, query, chat_history):
         print('OpenAI API key not found in environment variables.')
         exit()
 
+    # create the embedding and vector search objects
     embeddings = OpenAIEmbeddings(openai_api_key=api_key)
     vectors = MongoDBAtlasVectorSearch(
         collection=collection, text_key='messageText',
         embedding=embeddings, index_name='telegram_embedding'
     )
 
+    # create the memory object
     memory = ConversationBufferMemory( 
     memory_key='chat_history', 
     return_messages=True, 
     output_key='answer')
 
-    llm=ChatOpenAI(temperature=0.0, model_name='gpt-3.5-turbo', openai_api_key=api_key)
+    # create the large leanguage model object
+    llm=ChatOpenAI(temperature=0.0, model_name='gpt-3.5-turbo-16k', openai_api_key=api_key)
 
-
+    # create the prompt template for chatbot to use
     prompt_template = """Use the following pieces of context to answer the question at the end. 
     Combine the information from the context with your own general knowledge to provide a comprehensive and accurate answer. 
     Please be as specific as possible, also you are a friendly chatbot who is always polite.
@@ -110,6 +116,7 @@ def query(start_date, end_date, country, state, query, chat_history):
     # generate conditions
     must_conditions = parse_parameters(start_date, end_date, country, state)
 
+    # create a chatbot chain
     chain = ConversationalRetrievalChain.from_llm(
         llm=llm, 
         retriever=vectors.as_retriever(search_type = 'mmr',
@@ -127,10 +134,11 @@ def query(start_date, end_date, country, state, query, chat_history):
         combine_docs_chain_kwargs={"prompt": QA_CHAIN_PROMPT}
     )
 
-    chat_history = [chat_history]
+    # create the chat
     answer = chain({"question": query, "chat_history": chat_history})
-    print(answer["source_documents"][0].metadata['state'])
-    print(answer["source_documents"][0].metadata['country'])
-    print(answer["source_documents"][0].metadata['messageDatetime'])
-    print(answer["source_documents"][0].page_content)
-    return answer["answer"]
+    for i in range(10):
+        print(answer["source_documents"][i].metadata['state'])
+        print(answer["source_documents"][i].metadata['country'])
+        print(answer["source_documents"][i].metadata['messageDatetime'])
+    #print(answer["source_documents"][0].page_content)
+    return answer["answer"], answer['chat_history']
