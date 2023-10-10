@@ -18,7 +18,7 @@ topic_info = topic_model.get_topic_info()
 | Total topics       | 30      |
 | Training documents | 339,650 |
 
-## Training Hyperparameters
+### Training Hyperparameters
 
 | Parameter              | Value   |
 |------------------------|---------|
@@ -32,7 +32,7 @@ topic_info = topic_model.get_topic_info()
 | top_n_words            | 10      |
 | verbose                | True    |
 
-## Framework Versions
+### Framework Versions
 
 | Library               | Version |
 |-----------------------|---------|
