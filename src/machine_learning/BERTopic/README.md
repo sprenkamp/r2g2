@@ -49,7 +49,7 @@ topic_info = topic_model.get_topic_info()
 | bertopic              | 0.15.0  |
 
 
-Note:When saving the model, make sure to also keep track of the versions of dependencies and Python used. Loading and saving the model should be done using the same dependencies and Python. Moreover, models saved in one version of BERTopic are not guaranteed to load in other versions.
+Note:When loading the model, make sure to also keep track of the versions of dependencies and Python used. Loading the model should be done using the same dependencies and Python. Moreover, models saved in one version of BERTopic are not guaranteed to load in other versions.
 
 ## Data Preprocessing
 Initially, data preprocessing involved removing stopwords, hyperlinks, and emojis. However, we discovered that certain preprocessing steps, like emoji removal, could potentially impair the transformer models' training environment. Emojis, for instance, can be crucial for identifying advertisements. Thus, we keep the emoji, delaying the stopwords application until post-embedding to preserve the text's full contextual information, essential for accurate embedding generation.
