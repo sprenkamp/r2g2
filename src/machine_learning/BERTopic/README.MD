@@ -12,31 +12,42 @@ topic_model = BERTopic.load("kdot/BERTopicTelegramAnalysis")
 topic_info = topic_model.get_topic_info()
 ```
 ## Topic Overview
-Total topics: 30
-Training documents: 339,650
-View all topics
-Training Hyperparameters
-calculate_probabilities: False
-language: multilingual
-low_memory: False
-min_topic_size: 10
-n_gram_range: (1, 1)
-nr_topics: 30
-seed_topic_list: None
-top_n_words: 10
-verbose: True
-Framework Versions
-Numpy: 1.24.4
-HDBSCAN: 0.8.33
-UMAP: 0.5.4
-Pandas: 2.0.3
-Scikit-Learn: 1.0.2
-Sentence-transformers: 2.2.2
-Transformers: 4.33.2
-Numba: 0.58.0
-Plotly: 5.17.0
-Python: 3.8.10
-bertopic: 0.15.0
+
+| Attribute          | Value   |
+|--------------------|---------|
+| Total topics       | 30      |
+| Training documents | 339,650 |
+
+## Training Hyperparameters
+
+| Parameter              | Value   |
+|------------------------|---------|
+| calculate_probabilities| False   |
+| language               | multilingual |
+| low_memory             | False   |
+| min_topic_size         | 10      |
+| n_gram_range           | (1, 1)  |
+| nr_topics              | 30      |
+| seed_topic_list        | None    |
+| top_n_words            | 10      |
+| verbose                | True    |
+
+## Framework Versions
+
+| Library               | Version |
+|-----------------------|---------|
+| Numpy                 | 1.24.4  |
+| HDBSCAN               | 0.8.33  |
+| UMAP                  | 0.5.4   |
+| Pandas                | 2.0.3   |
+| Scikit-Learn          | 1.0.2   |
+| Sentence-transformers | 2.2.2   |
+| Transformers          | 4.33.2  |
+| Numba                 | 0.58.0  |
+| Plotly                | 5.17.0  |
+| Python                | 3.8.10  |
+| bertopic              | 0.15.0  |
+
 
 Note:When saving the model, make sure to also keep track of the versions of dependencies and Python used. Loading and saving the model should be done using the same dependencies and Python. Moreover, models saved in one version of BERTopic are not guaranteed to load in other versions.
 
@@ -46,7 +57,7 @@ The dataset was also cleansed of noisy elements like HTML tags, following Maarte
 
 ## Semi-Supervised Strategy
 To execute our semi-supervised strategy, pre-defined topics were supplied as input to the y parameter when fitting the BERTopic model. This approach allows BERTopic to fine-tune the topic creation based on these specified labels.
-
+```python
 class_name_dict = {-1:"no_class",
     0:"S Status Information",
     1:"Medical Information",
@@ -74,11 +85,10 @@ class_name_dict = {-1:"no_class",
     27:"Religious Information",
     28:'no_class', #@ mentions
 } 
-
+```
 A semi-supervised UMAP instance was utilized to reduce the embeddings' dimensionality before clustering documents with HDBSCAN. Our BERTopic configuration is detailed below:
 
-python
-Copy code
+```python
 self.model = BERTopic(
     embedding_model="paraphrase-multilingual-MiniLM-L12-v2",
     language="multilingual",
@@ -89,7 +99,7 @@ self.model = BERTopic(
     vectorizer_model=vectorizer_model,
     calculate_probabilities=False
 )
-
+```
 Performance enhancements were achieved by setting low_memory=true and calculate_probabilities=False. During the UMAP step, n_neighbours was truncated to 10 for smoother operations to combat the dominance of non-essential data like timestamps or ads in leading clusters. Relevant Russian keywords were appended to our stopwords_ua.txt list, applied post-embedding and clustering.
 
 ## Transformer Selection
