@@ -4,12 +4,13 @@ Leverage the BERTopic framework to generate easily interpretable topics from vas
 
 ## Installation
 To utilize this model, install BERTopic via pip:
+```bash
 pip install -U bertopic
-
+```
 topic_model = BERTopic.load("kdot/BERTopicTelegramAnalysis")
 topic_info = topic_model.get_topic_info()
 
-Topic Overview
+## Topic Overview
 Total topics: 30
 Training documents: 339,650
 View all topics
@@ -38,11 +39,11 @@ bertopic: 0.15.0
 
 Note:When saving the model, make sure to also keep track of the versions of dependencies and Python used. Loading and saving the model should be done using the same dependencies and Python. Moreover, models saved in one version of BERTopic are not guaranteed to load in other versions.
 
-Data Preprocessing
+## Data Preprocessing
 Initially, data preprocessing involved removing stopwords, hyperlinks, and emojis. However, we discovered that certain preprocessing steps, like emoji removal, could potentially impair the transformer models' training environment. Emojis, for instance, can be crucial for identifying advertisements. Thus, we keep the emoji, delaying the stopwords application until post-embedding to preserve the text's full contextual information, essential for accurate embedding generation.
 The dataset was also cleansed of noisy elements like HTML tags, following Maarten's suggestion. From the unlabeled dataset of over 2 million records, data pertinent to Switzerland was extracted and merged with the supervised dataset, retaining only the text and cluster_id columns.
 
-Semi-Supervised Strategy
+## Semi-Supervised Strategy
 To execute our semi-supervised strategy, pre-defined topics were supplied as input to the y parameter when fitting the BERTopic model. This approach allows BERTopic to fine-tune the topic creation based on these specified labels.
 
 class_name_dict = {-1:"no_class",
@@ -73,7 +74,6 @@ class_name_dict = {-1:"no_class",
     28:'no_class', #@ mentions
 } 
 
-Dimensionality Reduction and Clustering
 A semi-supervised UMAP instance was utilized to reduce the embeddings' dimensionality before clustering documents with HDBSCAN. Our BERTopic configuration is detailed below:
 
 python
@@ -89,10 +89,9 @@ self.model = BERTopic(
     calculate_probabilities=False
 )
 
-Performance Enhancements
 Performance enhancements were achieved by setting low_memory=true and calculate_probabilities=False. During the UMAP step, n_neighbours was truncated to 10 for smoother operations to combat the dominance of non-essential data like timestamps or ads in leading clusters. Relevant Russian keywords were appended to our stopwords_ua.txt list, applied post-embedding and clustering.
 
-Transformer Selection
+## Transformer Selection
 Our transformer selection was influenced by a comparison between paraphrase-multilingual-mpnet-base-v2 and paraphrase-multilingual-MiniLM-L12-v2. Despite the former's slightly superior performance, its processing speed was thrice as slow, making paraphrase-multilingual-MiniLM-L12-v2 a more efficient choice.
 
 The trained model was stored using safertensors due to its lightweight format, suitable for production use, and shared on the HuggingFace Hub.  https://huggingface.co/kdot/BERTopicTelegramAnalysis
