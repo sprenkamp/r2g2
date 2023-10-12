@@ -69,6 +69,9 @@ class_name_dict = {-1: {'cluster_id': -1, 'cluster_name': 'Unknown', 'sub_cluste
 A semi-supervised UMAP instance was utilized to reduce the embeddings' dimensionality before clustering documents with HDBSCAN. Our BERTopic configuration is detailed below:
 
 ```python
+umap_model = UMAP(n_neighbors=20, n_components=15, metric='cosine', low_memory=True, random_state=42)
+hdbscan_model = HDBSCAN(min_cluster_size=100, metric='euclidean', prediction_data=True)
+vectorizer_model = CountVectorizer(ngram_range=(1, 2), stop_words=list(stopWords), min_df=15)
 self.model = BERTopic(
     embedding_model="paraphrase-multilingual-MiniLM-L12-v2",
     language="multilingual",
