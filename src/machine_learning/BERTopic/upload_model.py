@@ -6,7 +6,7 @@ import pandas as pd
 access_token_write = "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"
 login(token = access_token_write)
 
-topic_model = BERTopic.load("src\machine_learning\BERTopic\Result_ulti")
+topic_model = BERTopic.load(r"src\machine_learning\BERTopic\Result_ulti")
 
 # Push to HuggingFace Hub
 topic_model.push_to_hf_hub(
