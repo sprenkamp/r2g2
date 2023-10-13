@@ -93,9 +93,6 @@
           <el-container class="chart-container">
             <LineChart :height="300" :chartData="chartData" :selectedState="selectedState" />
           </el-container>
-          <el-row>
-            <div class="empty-line"></div>
-          </el-row>
         </el-col>
       </el-row>
     </el-main>
@@ -316,7 +313,6 @@ export default {
     },
     handleStateSelected(selectedState) {
       this.selectedState = selectedState;
-      // this.$refs.mapcomponent.zoomToSelectedState(selectedState);
     },
     toggleSidebar() {
       this.showSidebar = !this.showSidebar;

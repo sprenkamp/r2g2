@@ -4,11 +4,11 @@
     <el-menu class="el-menu flex-container" mode="horizontal" :ellipsis="false">
         <el-menu-item index="0">LOGO</el-menu-item>
         <div class="flex-grow"/>
-        <el-menu-item>
+        <!-- <el-menu-item>
             <el-button color="FFFFFF" type="primary" class="button1">
                 <router-link to="/testpage" class="test">test</router-link>
             </el-button>
-        </el-menu-item>
+        </el-menu-item> -->
 
         <router-link to="/" class="Home">
             <el-menu-item index="0.5">
@@ -31,12 +31,12 @@
             </el-menu-item>
         </router-link>
 
-        <router-link to="/Page3" class="Page3">
+        <!-- <router-link to="/Page3" class="Page3">
             <el-menu-item index="3">
                 <el-icon><setting /></el-icon>
                 Page 3
             </el-menu-item>
-        </router-link>
+        </router-link> -->
 
         <el-switch 
             v-model='themeConfig.isDark'

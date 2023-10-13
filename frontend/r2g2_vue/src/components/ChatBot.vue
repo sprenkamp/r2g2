@@ -27,15 +27,6 @@
         </div>
       </div>
       <div class="inputContainer">
-        <el-cascader 
-            v-model="select" 
-            :options="options" 
-            :props="props" 
-            placeholder="Select"  
-            style="width: 100px" 
-            clearable
-            filterable
-        />
         <el-autocomplete
           v-model="currentMessage"
           :fetch-suggestions="querySearch"
@@ -75,188 +66,7 @@ const answer = ref<string>('');
 const props = {
   expandTrigger: 'hover' as const,
 }
-const options = [
-  {
-    value: 'Switzerland',
-    label: 'Switzerland',
-    children: [
-            {
-              value: 'Zurich',
-              label: 'Zurich',
-            },
-            {
-              value: 'Bern',
-              label: 'Bern',
-            },
-            {
-              value: 'Lucerne',
-              label: 'Lucerne',
-            },
-            {
-              value: 'Uri',
-              label: 'Uri',
-            },
-            {
-              value: 'Schwyz',
-              label: 'Schwyz',
-            },
-            {
-              value: 'Obwalden',
-              label: 'Obwalden',
-            },
-            {
-              value: 'Nidwalden',
-              label: 'Nidwalden',
-            },
-            {
-              value: 'Glarus',
-              label: 'Glarus',
-            },
-            {
-              value: 'Zug',
-              label: 'Zug',
-            },
-            {
-              value: 'Fribourg',
-              label: 'Fribourg',
-            },
-            {
-              value: 'Solothurn',
-              label: 'Solothurn',
-            },
-            {
-              value: 'Basel-Stadt',
-              label: 'Basel-Stadt',
-            },
-            {
-              value: 'Basel-Landschaft',
-              label: 'Basel-Landschaft',
-            },
-            {
-              value: 'Schaffhausen',
-              label: 'Schaffhausen',
-            },
-            {
-              value: 'Appenzell Ausserrhoden',
-              label: 'Appenzell Ausserrhoden',
-            },
-            {
-              value: 'Appenzell Innerrhoden',
-              label: 'Appenzell Innerrhoden',
-            },
-            {
-              value: 'St. Gallen',
-              label: 'St. Gallen',
-            },
-            {
-              value: 'Graubünden',
-              label: 'Graubünden',
-            },
-            {
-              value: 'Aargau',
-              label: 'Aargau',
-            },
-            {
-              value: 'Thurgau',
-              label: 'Thurgau',
-            },
-            {
-              value: 'Ticino',
-              label: 'Ticino',
-            },
-            {
-              value: 'Vaud',
-              label: 'Vaud',
-            },
-            {
-              value: 'Valais',
-              label: 'Valais',
-            },
-            {
-              value: 'Neuchâtel',
-              label: 'Neuchâtel',
-            },
-            {
-              value: 'Geneva',
-              label: 'Geneva',
-            },
-            {
-              value: 'Jura',
-              label: 'Jura',
-            },
-          ],
-  },
-  {
-    value: 'Germany',
-    label: 'Germany',
-    children: [
-            {
-              value: 'Baden-Württemberg',
-              label: 'Baden-Württemberg',
-            },
-            {
-              value: 'Bavaria',
-              label: 'Bavaria',
-            },
-            {
-              value: 'Berlin',
-              label: 'Berlin',
-            },
-            {
-              value: 'Brandenburg',
-              label: 'Brandenburg',
-            },
-            {
-              value: 'Bremen',
-              label: 'Bremen',
-            },
-            {
-              value: 'Hamburg',
-              label: 'Hamburg',
-            },
-            {
-              value: 'Hesse',
-              label: 'Hesse',
-            },
-            {
-              value: 'Lower Saxony',
-              label: 'Lower Saxony',
-            },
-            {
-              value: 'Mecklenburg-Vorpommern',
-              label: 'Mecklenburg-Vorpommern',
-            },
-            {
-              value: 'North Rhine-Westphalia',
-              label: 'North Rhine-Westphalia',
-            },
-            {
-              value: 'Rhineland-Palatinate',
-              label: 'Rhineland-Palatinate',
-            },
-            {
-              value: 'Saarland',
-              label: 'Saarland',
-            },
-            {
-              value: 'Saxony',
-              label: 'Saxony',
-            },
-            {
-              value: 'Saxony-Anhalt',
-              label: 'Saxony-Anhalt',
-            },
-            {
-              value: 'Schleswig-Holstein',
-              label: 'Schleswig-Holstein',
-            },
-            {
-              value: 'Thuringia',
-              label: 'Thuringia',
-            },
-          ],
-  }
-]
+
 // const sendMessage = async (message: string) => {
 //   messages.value.push({
 //     from: 'user',
@@ -275,23 +85,53 @@ const options = [
 //     }
 // };
 
+// code for chat_fastapi_app.py
 const sendMessage = async (message: string) => {
   messages.value.push({
     from: 'user',
     data: message,
   });
+  
   try {
-    const response = await axios.post('http://localhost:3000/chatbot', {
-      message: message,
-    });
+    const requestBody = {
+      start_date: "2022-01-01",
+      end_date: "2022-01-03",
+      country: "Switzerland",
+      state: "Zurich",
+      predicted_class: "Education",
+      query: message,
+      chat_history: [],
+    };
+    
+    const response = await axios.post('http://16.170.236.176:8000/query', requestBody);
     messages.value.push({
       from: 'chatGpt',
-      data: response.data.answer.text,
+      data: response.data,
     });
   } catch (error) {
     console.error(error);
   }
 };
+
+
+// // code for langchain.js
+// const sendMessage = async (message: string) => {
+//   messages.value.push({
+//     from: 'user',
+//     data: message,
+//   });
+//   try {
+//     const response = await axios.post('http://localhost:3000/chatbot', {
+//       message: message,
+//     });
+//     messages.value.push({
+//       from: 'chatGpt',
+//       data: response.data.answer.text,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
 
 const clearChatHistory = () => {
   messages.value.splice(0, messages.value.length);
@@ -317,12 +157,12 @@ const sendQuestion = (question) => {
 };
 
 questions.value = [
-{ value: 'hello' },
+{ value: 'hello, how are you?' },
 { value: 'Can I find a job in Switzerland as a nurse?' },
-{ value: 'who is the president of USA' },
-{ value: 'question template 2' },
-{ value: 'question template 3' },
-{ value: 'question template 4' },
+{ value: 'Who is the president of USA?' },
+// { value: 'question template 2' },
+// { value: 'question template 3' },
+// { value: 'question template 4' },
 // ... other data items ...
 ];
 
