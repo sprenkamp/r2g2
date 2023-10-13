@@ -1,0 +1,18 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: chat_fastapi.dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ATLAS_TOKEN=${ATLAS_TOKEN}
+      - ATLAS_USER=${ATLAS_USER}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge

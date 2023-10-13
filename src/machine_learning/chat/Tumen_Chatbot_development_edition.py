@@ -49,7 +49,17 @@ def parse_parameters(start_date, end_date, country, state):
             'lte': datetime.datetime.strptime(end_date, "%Y-%m-%d")+datetime.timedelta(days=1),
         }
     }
+    
     must_conditions.append(filter)
+    
+    # if predicted_class != 'null':
+    #     filter = {
+    #         "text": {
+    #             "path": "predicted_class",
+    #             "query": str(predicted_class)
+    #         }
+    #     }
+    #     must_conditions.append(filter) 
 
     conditions = {
         "compound": {
@@ -140,5 +150,6 @@ def query(start_date, end_date, country, state, query, chat_history):
         print(answer["source_documents"][i].metadata['state'])
         print(answer["source_documents"][i].metadata['country'])
         print(answer["source_documents"][i].metadata['messageDatetime'])
+        print(answer["source_documents"][i].metadata['predicted_class'])
     #print(answer["source_documents"][0].page_content)
     return answer["answer"], answer['chat_history']
