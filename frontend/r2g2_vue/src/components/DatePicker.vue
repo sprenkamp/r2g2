@@ -26,7 +26,6 @@ import { ref, defineProps, defineEmits } from 'vue'
 const { minDate, maxDate } = defineProps(['minDate', 'maxDate'])
 const emits = defineEmits()
 const value = ref([minDate, maxDate])
-
 const disabledDate = (time) => {
     if (minDate && maxDate) {
         return time < new Date(minDate) || time > new Date(maxDate)
@@ -34,6 +33,7 @@ const disabledDate = (time) => {
     return false
 }
 
+// transfer data
 const handleDateChange = (value) => {
     emits('selected-date', value)
 }

@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed} from 'vue'
+import {ref, defineProps} from 'vue'
 import axios from 'axios';
 import { Apple, Watermelon, Pear, Lollipop, Search} from '@element-plus/icons-vue'
 import { Icon } from '@iconify/vue';
@@ -66,7 +66,12 @@ const answer = ref<string>('');
 const props = {
   expandTrigger: 'hover' as const,
 }
-
+const prop = defineProps({
+  selectedNews: String,
+  selectedState: String,
+  minDate: String,
+  maxDate: String,
+})
 // const sendMessage = async (message: string) => {
 //   messages.value.push({
 //     from: 'user',
@@ -91,18 +96,18 @@ const sendMessage = async (message: string) => {
     from: 'user',
     data: message,
   });
-  
+
   try {
     const requestBody = {
-      start_date: "2022-01-01",
-      end_date: "2022-01-03",
+      start_date: prop.minDate,
+      end_date: prop.maxDate,
       country: "Switzerland",
-      state: "Zurich",
-      predicted_class: "Education",
+      state: prop.selectedState,
+      predicted_class: prop.selectedNews,
       query: message,
       chat_history: [],
     };
-    
+    console.log('requestBody:', requestBody);
     const response = await axios.post('http://16.170.236.176:8000/query', requestBody);
     messages.value.push({
       from: 'chatGpt',

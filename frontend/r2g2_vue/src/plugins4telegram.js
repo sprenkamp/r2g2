@@ -13,7 +13,7 @@ const Plugins = function (app, options) {
 
   // function get all cluster categories
   app.config.globalProperties.$getCluster_tele = async function(data_tele) {
-    const clusterCategories = Array.from(new Set(data_tele.map((item) => item.cluster)))
+    const clusterCategories = Array.from(new Set(data_tele.map((item) => item.predicted_class)))
     // const clusterCategories = Array.from(new Set(data_tele.map((item) => item.cluster_fixed)))
     return clusterCategories;
   };
@@ -21,25 +21,27 @@ const Plugins = function (app, options) {
   // function get all state categories
   app.config.globalProperties.$getState_tele = async function(data_tele) {
     const stateCategories = Array.from(new Set(data_tele.map((item) => item.state)))
+    console.log(stateCategories)
     return stateCategories;
   };
 
-  // function to get all date
   app.config.globalProperties.$getDate_tele = async function(data_tele) {
-    const dates = Array.from(new Set(data_tele.map((item) => new Date(item.date))));
-    const dateData = Array.from(new Set(data_tele.map((item) => item.date)))
-    this.$minDate_tele = new Date(Math.min(...dates)).toISOString().split('T')[0];
-    this.$maxDate_tele = new Date(Math.max(...dates)).toISOString().split('T')[0];
+    const validData = data_tele.filter(item => item.messageDate !== undefined);
+    const dates = Array.from(new Set(validData.map((item) => item.messageDate)));
+    const dateData = Array.from(new Set(validData.map((item) => item.messageDate)));
+    this.$minDate_tele = Math.min(...dates);
+    this.$maxDate_tele = Math.max(...dates);
     dateData.sort((a, b) => new Date(a) - new Date(b));
     return dateData;
   };
+  
 
   // function count cluster
   app.config.globalProperties.$countProp_tele = async function(data_tele, targetDate, specifiedCluster) {
     const clustersCount = {};
     data_tele.forEach(item => {
       // const clusters = Array.isArray(item.cluster_fixed) ? item.cluster_fixed : [item.cluster_fixed];
-      const clusters = Array.isArray(item.cluster) ? item.cluster : [item.cluster];
+      const clusters = Array.isArray(item.predicted_class) ? item.predicted_class : [item.predicted_class];
       const date = item.date;
       if (date === targetDate && (!specifiedCluster || clusters.some(cluster => specifiedCluster.includes(cluster)))) {
         clusters.forEach(cluster => {
@@ -58,8 +60,8 @@ const Plugins = function (app, options) {
   app.config.globalProperties.$countedCluster = async function(data_tele, targetDate, specifiedCluster) {
     const clustersCount = {};
     data_tele.forEach(item => {
-      const cluster = item.cluster;
-      const date = item.date;
+      const cluster = item.predicted_class;
+      const date = item.messageDate;
       const count = item.count;
 
       if (date === targetDate && (!specifiedCluster || specifiedCluster.includes(cluster))) {

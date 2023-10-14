@@ -3,18 +3,17 @@
 <template>
   <div class="navigation">
     <Navigation/>
-    <el-button @click="toggleSidebar">
+    <!-- <el-button @click="toggleSidebar">
       <Icon
         :icon="showSidebar ? 'material-symbols:play-arrow-outline' : 'material-symbols:play-arrow-outline'"
         :rotate="showSidebar ? 2 : 0"
       />
-    </el-button>
+    </el-button> -->
   </div>
   <el-container class="layout-container">
     <loading :active="isLoading" :is-full-page="true" :loader="loader" />
-    <el-aside width="300px" v-show="showSidebar">
+    <!-- <el-aside width="300px" v-show="showSidebar">
       <el-scrollbar>
-        <!-- 数据类别选择框/topics selection box -->
         <div class="m-4">
           <h3>{{$t('Choose the topics of interest within the telegram data')}}</h3>
           <el-select
@@ -36,7 +35,7 @@
           <div class="empty-line"></div>
         </el-row>
       </el-scrollbar>
-    </el-aside>
+    </el-aside> -->
   
     <!-- 主页面/main -->
     <el-main>
@@ -46,18 +45,34 @@
       <!-- 第一行/first row -->
       <el-row>
         <!-- 第一行第一列 选择国家/first column in first row, select country -->
-        <el-col :span="8"><div class="grid-content ep-bg-purple"/>
-          <h3>{{$t('Select a country of interest')}}</h3>
+        <el-col :span="3"></el-col>
+        <el-col :span="5"><div class="grid-content ep-bg-purple"/>
+          <!-- <h3>{{$t('Select a country of interest')}}</h3>
           <el-select v-model="selectedCountry" class="m-2" placeholder="Select" size="large" clearable>
             <el-option
               v-for="(country) in countryOptions"
               :key="$t(country)"
               :value="$t(country)"
             />
+          </el-select> -->
+          <!-- 数据类别选择框/topics selection box -->
+          <h3>{{$t('Choose a topic of interest')}}</h3>
+          <el-select
+            v-model="selectedNews"
+            placeholder="Select"
+            size="large"
+            clearable
+          >
+            <el-option
+              v-for="item in newsOptions"
+              :key="item.value"
+              :value="item.value"
+            />
           </el-select>
         </el-col>
+        <el-col :span="1"></el-col>
         <!-- 第一行第二列 选择州/second column in first row, select state -->
-        <el-col :span="8"><div class="grid-content ep-bg-purple-light" />
+        <el-col :span="5"><div class="grid-content ep-bg-purple-light" />
           <h3>{{$t('Choose a state of interest')}}</h3>
           <el-select v-model="selectedState" class="m-2" placeholder="Select" size="large" clearable>
             <el-option
@@ -67,6 +82,7 @@
             />
           </el-select>
         </el-col>
+        <el-col :span="1"></el-col>
         <!-- 第一行第三列 时间轴/third column in first row, time slider -->
         <el-col :span="8"><div class="grid-content ep-bg-purple" />
           <h3>{{$t('Choose date range of interest')}}</h3>
@@ -116,7 +132,11 @@
   </el-affix>
   <el-affix position="bottom" :offset="750">
     <el-container class="chatbot-container">
-      <ChatBot v-show="showChatbot"/>
+      <ChatBot v-show="showChatbot" 
+        :selectedNews="selectedNews" 
+        :selectedState="selectedState" 
+        :minDate="minDate"
+        :maxDate="maxDate"/>
     </el-container>
   </el-affix>
 </template>
@@ -154,10 +174,11 @@
         loader: "bars",
         showSidebar: false,       // show side bar
         sidebarIcon: arrowright,
-        selectedNews: ['all found topics'], // 
+        selectedNews: [], // 
         newsOptions: [],         // store clusters options in data
         selectedCountry: '',     // country property, define the current chosen country in web
-        countryOptions: ['all countries analysed', 'Germany', 'Switzerland'], // define country options in select box
+        countryOptions: ['Switzerland'], // define country options in select box
+        // countryOptions: ['all countries analysed', 'Germany', 'Switzerland'],
         selectedState: '',       // state property, define the current chosen state
         stateOptions: [],        // define state options in select box
         selectedDate: null,      // date property, define the date range in time slider
@@ -182,7 +203,7 @@
         // get all cluster in array like {1:xx, 2:yy, ...}
         const clusteredData = await this.$getCluster_tele(this.dataTele);
         this.newsOptions = clusteredData.map((cluster) => ({
-          value: cluster,
+          value: cluster !== undefined ? cluster : "undefined",
         }));
 
         // 默认选中 "all found topics"
@@ -250,7 +271,7 @@
               this.dataTele = this.cachedData.dataTele;
           } else {
               try {
-                  const response = await axios.get('http://localhost:8000/test/bertopic');
+                  const response = await axios.get('http://localhost:8000/scrape/telegram_count');
                   this.dataTele = response.data;
                   this.cachedData.dataTele = this.dataTele;
               } catch(error) {
@@ -331,6 +352,7 @@
       toggleChatbot() {
         this.showChatbot = !this.showChatbot;
       },
+      // transfer cluster and state to chatbot
     },
   };
   </script>
@@ -370,7 +392,6 @@
     background-color: transparent;
   }
   .layout-container h1 {
-    font-family: 'IM Fell English', serif;
     margin: 10px;
     font-size: 30px;
     text-align: center;
