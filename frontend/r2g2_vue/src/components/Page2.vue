@@ -40,7 +40,7 @@
     <!-- 主页面/main -->
     <el-main>
       <el-row class="header">
-        <h1>{{$t('Identification of the most relevant topics in the context of the Ukrainian Refugee Crisis in the media and social media')}}</h1>
+        <h1>{{$t('Identifying the most relevant topics in Telegram related to the Ukrainian refugee crisis')}}</h1>
       </el-row>
       <!-- 第一行/first row -->
       <el-row>
@@ -135,8 +135,8 @@
       <ChatBot v-show="showChatbot" 
         :selectedNews="selectedNews" 
         :selectedState="selectedState" 
-        :minDate="minDate"
-        :maxDate="maxDate"/>
+        :minDate="dateOptions[0]"
+        :maxDate="dateOptions[dateOptions.length-1]"/>
     </el-container>
   </el-affix>
 </template>
@@ -198,6 +198,59 @@
   
     async created(){
         this.isLoading = true;
+        // try {
+        //   this.asyncRequests = [
+        //     this.fetch(),
+        //     this.$getCluster_tele(this.dataTele),
+        //     this.$getState_tele(this.dataTele),
+        //     this.$getDate_tele(this.dataTele),
+        //   ];
+
+        //   const [response1, response2, response3, response4] = await Promise.all(this.asyncRequests);
+
+        //   this.dataTele = response1.data;
+        //   this.newsOptions = response2.map((cluster) => ({
+        //     value: cluster !== undefined ? cluster : "undefined",
+        //   }));
+
+        //   this.selectedNews = this.newsOptions.map(option => option.value);
+        //   this.stateOptions = response3.map((state) => ({
+        //     value: state,
+        //   }));
+
+        //   this.dateOptions = response4;
+        //   this.minDate = this.dateOptions[0];
+        //   this.maxDate = this.dateOptions[this.dateOptions.length - 1];
+        //   this.selectedDate = [this.minDate, this.maxDate];
+
+        //   // Load data and draw chart
+        //   const allClustersData = {};
+
+        //   for (const targetDate of this.dateOptions) {
+        //     const allClustersCount = await this.$countedCluster(this.dataTele, targetDate);
+        //     allClustersData[targetDate] = allClustersCount;
+        //   }
+
+        //   // moving average
+        //   // const aftermovingAverage = await this.$movingAverage(allClustersData, 21);
+        //   this.chartData = {
+        //     labels: this.dateOptions,
+        //     datasets: this.newsOptions.map((option) => ({
+        //       tension: 0.3,
+        //       label: option.value,
+        //       data: this.dateOptions.map((date) => allClustersData[date][option.value] || 0),
+        //       borderWidth: 2,
+        //       fill: false,
+        //       pointStyle: false,
+        //     }))
+        //   };
+        //   this.filteredData = await this.filterDataByCountryAndState();
+        //   this.isLoading = false;
+        // } catch (error) {
+        //   console.error('加载资源时出错：', error);
+        //   // 处理错误情况
+        // }
+      
         await this.fetch();
 
         // get all cluster in array like {1:xx, 2:yy, ...}
@@ -301,6 +354,7 @@
           return;
         }
         this.dateOptions = await this.$convertTimetoString_tele(value);
+        console.log(this.dateOptions[0])
         this.updateChartData();
       },
       async updateChartData() {

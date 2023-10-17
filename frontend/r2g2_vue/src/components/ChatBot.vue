@@ -96,9 +96,7 @@ const sendMessage = async (message: string) => {
     from: 'user',
     data: message,
   });
-
-  try {
-    const requestBody = {
+  const requestBody = {
       start_date: prop.minDate,
       end_date: prop.maxDate,
       country: "Switzerland",
@@ -106,12 +104,22 @@ const sendMessage = async (message: string) => {
       predicted_class: prop.selectedNews,
       query: message,
       chat_history: [],
-    };
+  };
+  // const requestBody = {
+  //   start_date: "2022-01-01",
+  //   end_date: "2022-01-02",
+  //   country: "Switzerland",
+  //   state: "Zurich",
+  //   predicted_class: "Education",
+  //   query: "What are the biggest needs of refugees within the education sector?",
+  //   chat_history: []
+  // };
+  try {
     console.log('requestBody:', requestBody);
-    const response = await axios.post('http://16.170.236.176:8000/query', requestBody);
+    const response = await axios.post('http://16.170.163.240:8000/query', requestBody);
     messages.value.push({
       from: 'chatGpt',
-      data: response.data,
+      data: response.data[0],
     });
   } catch (error) {
     console.error(error);

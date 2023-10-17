@@ -21,7 +21,6 @@ const Plugins = function (app, options) {
   // function get all state categories
   app.config.globalProperties.$getState_tele = async function(data_tele) {
     const stateCategories = Array.from(new Set(data_tele.map((item) => item.state)))
-    console.log(stateCategories)
     return stateCategories;
   };
 

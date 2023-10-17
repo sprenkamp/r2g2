@@ -1,6 +1,6 @@
 <!-- MapComponent.vue -->
 
-<template>
+<!-- <template>
   <div>
     <div>
       <loading :active="isLoading" :is-full-page="true" :loader="loader" />
@@ -202,5 +202,169 @@ export default {
     },
   },
 };
-</script>
+</script> -->
 
+<template>
+  <div>
+    <div>
+      <loading :active="isLoading" :is-full-page="true" :loader="loader" />
+      <label for="checkbox">GeoJSON Visibility</label>
+      <input
+        id="checkbox"
+        v-model="show"
+        type="checkbox"
+      >
+      <label for="checkboxTooltip">Enable tooltip</label>
+      <input
+        id="checkboxTooltip"
+        v-model="enableTooltip"
+        type="checkbox"
+      >
+    </div>
+    <l-map
+      :zoom="mapOptions.zoom"
+      :center="mapOptions.center"
+      style="height: 500px; width: 100%"
+      @ready="onMapReady"
+    >
+      <l-tile-layer
+        :url="url"
+        :attribution="attribution"
+      />
+      <l-geo-json
+        v-if="show"
+        :geojson="geojson"
+        :options="options"
+        :options-style="styleFunction"
+      />
+    </l-map>
+  </div>
+</template>
+
+<script>
+import { LMap, LTileLayer, LGeoJson } from "@vue-leaflet/vue-leaflet";
+import L from 'leaflet'
+
+export default {
+  name: "MapComponent",
+  components: {
+    LMap,
+    LTileLayer,
+    LGeoJson,
+  },
+  data() {
+    return {
+      isLoading: false,
+      loader: "bars",
+      show: true,
+      enableTooltip: true,
+      zoom: null,
+      center: [46.8182, 8.2275],
+      geojson: null,
+      fillColor: "rgba(0, 0, 0, 0)",
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attribution:
+        '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      mapOptions: {
+        zoom: 6.5,
+        center: [46.8182, 8.2275], 
+      },
+    };
+  },
+  computed: {
+    options() {
+      return {
+        onEachFeature: this.onEachFeatureFunction
+      };
+    },
+    styleFunction() {
+      const fillColor = this.fillColor; // important! need touch fillColor in computed for re-calculate when change fillColor
+      return () => {
+        return {
+          weight: 2,
+          color: "blue",
+          opacity: 1,
+          fillColor: fillColor,
+          fillOpacity: 1
+        };
+      };
+    },
+    onEachFeatureFunction() {
+      if (!this.enableTooltip) {
+        return () => {};
+      }
+      return (feature, layer) => {
+        layer.bindTooltip(
+          "<div>Country:" +
+            feature.properties.country +
+            "</div><div>State: " +
+            feature.properties.state +
+            "</div>",
+          { permanent: false, sticky: true }
+        );
+        layer.on({
+          mouseover: this.highlightFeature,
+          mouseout: this.resetHighlight,
+          click: this.zoomToFeature,
+        });
+      };
+    },
+  },
+  async created() {
+    this.isLoading = true;
+    const response = await fetch("https://raw.githubusercontent.com/sprenkamp/r2g2/main/frontend/r2g2_vue/src/data/germany_switzerland.geojson")
+    const data = await response.json();
+
+    // only use swiss part
+    const switzerlandFeatures = data.features.filter(feature => feature.properties.country === "Switzerland");
+    this.geojson = {
+      type: "FeatureCollection",
+      features: switzerlandFeatures,
+    };
+
+    this.isLoading = false;
+  },
+  methods: {
+    onMapReady(map) {
+      map.on("zoomend", () => {
+        this.mapOptions.zoom = map.getZoom();
+      });
+      map.on("moveend", () => {
+        this.mapOptions.center = map.getCenter();
+      });
+      this.mapInstance = map;
+    },
+
+    // 高亮 鼠标悬停
+    highlightFeature(e) {
+      const layer = e.target;
+      layer.setStyle({
+          weight: 5,
+          color: 'yellow',
+          dashArray: '',
+          fillOpacity: 0.7
+      });
+      if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+          layer.bringToFront();
+      }
+    },
+    // mouseout
+    resetHighlight(e) {
+      const layer = e.target;
+      layer.setStyle({
+        weight: 2,
+        color: "blue",
+        opacity: 1,
+        fillColor: this.fillColor,
+        fillOpacity: 1
+      });
+    },
+    // zoom automatically
+    zoomToFeature(e) {
+      const selectedState = e.target.feature.properties.state;
+      this.$emit('stateSelected', selectedState);
+      this.mapInstance.fitBounds(e.target.getBounds());
+    },
+  },
+};
+</script>
