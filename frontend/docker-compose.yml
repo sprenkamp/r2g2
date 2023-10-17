@@ -1,0 +1,37 @@
+version: "3"
+services:
+  chatgpt_backend:
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - PORT=3000
+    build:
+      context: ./chatgpt-backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+  mongodb_backend:
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - PORT=8000
+    build:
+      context: ./mongoDB-backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+  r2g2_vue:
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    build:
+      context: ./r2g2_vue
+      dockerfile: Dockerfile
+    ports:
+      - "8001:80"
+    depends_on:
+      - mongodb_backend
+      - chatgpt_backend
+    links:
+      - mongodb_backend
+      - chatgpt_backend
