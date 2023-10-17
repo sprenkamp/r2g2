@@ -140,7 +140,7 @@ def query(start_date, end_date, country, state, query, predicted_class, chat_his
     )
 
     # chat_history = [chat_history]
-    print(chain)
+    #print(chain)
     answer = chain({"question": query, "chat_history": chat_history})
     print(answer["source_documents"][0].metadata['state'])
     print(answer["source_documents"][0].metadata['country'])
