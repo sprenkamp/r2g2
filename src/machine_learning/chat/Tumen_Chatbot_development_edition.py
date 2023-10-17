@@ -20,7 +20,7 @@ ATLAS_TOKEN = os.environ["ATLAS_TOKEN"]
 ATLAS_USER = os.environ["ATLAS_USER"]
 
 # This function is used to parse the filters into the format that can be used by MongoDB
-def parse_parameters(start_date, end_date, country, state):
+def parse_parameters(start_date, end_date, country, state, predicted_class):
     must_conditions = []
     if state != 'null':
         filter = {
@@ -39,6 +39,15 @@ def parse_parameters(start_date, end_date, country, state):
             }
         }
         must_conditions.append(filter)
+        
+    if predicted_class != 'null':
+        filter = {
+            "text": {
+                "path": "predicted_class",
+                "query": predicted_class
+            }
+        }
+        must_conditions.append(filter)
 
     start_date = '1999-01-01' if start_date == 'null' else start_date
     end_date = '2999-01-01' if end_date == 'null' else end_date
@@ -51,15 +60,6 @@ def parse_parameters(start_date, end_date, country, state):
     }
     
     must_conditions.append(filter)
-    
-    # if predicted_class != 'null':
-    #     filter = {
-    #         "text": {
-    #             "path": "predicted_class",
-    #             "query": str(predicted_class)
-    #         }
-    #     }
-    #     must_conditions.append(filter) 
 
     conditions = {
         "compound": {
@@ -71,7 +71,7 @@ def parse_parameters(start_date, end_date, country, state):
 
 # This function calls the chatbot and returns the answer and prints all the relevant metadata
 @app.post("/query")
-def query(start_date, end_date, country, state, query, chat_history):
+def query(start_date, end_date, country, state, query, predicted_class, chat_history):
     '''
 
     Args:
@@ -124,7 +124,7 @@ def query(start_date, end_date, country, state, query, chat_history):
     QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt_template)
 
     # generate conditions
-    must_conditions = parse_parameters(start_date, end_date, country, state)
+    must_conditions = parse_parameters(start_date, end_date, country, state, predicted_class)
 
     # create a chatbot chain
     chain = ConversationalRetrievalChain.from_llm(
