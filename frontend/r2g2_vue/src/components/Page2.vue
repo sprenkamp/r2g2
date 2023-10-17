@@ -324,7 +324,7 @@
               this.dataTele = this.cachedData.dataTele;
           } else {
               try {
-                  const response = await axios.get('http://localhost:8000/scrape/telegram_count');
+                  const response = await axios.get('http://localhost:8000/aggregate/TelegramCount');
                   this.dataTele = response.data;
                   this.cachedData.dataTele = this.dataTele;
               } catch(error) {
