@@ -16,7 +16,7 @@ import datetime
 ATLAS_TOKEN = os.environ["ATLAS_TOKEN"]
 ATLAS_USER = os.environ["ATLAS_USER"]
 
-def parse_parameters(start_date, end_date, country, state):
+def parse_parameters(start_date, end_date, country, state, predicted_class):
     must_conditions = []
     if state != 'null':
         filter = {
@@ -32,6 +32,15 @@ def parse_parameters(start_date, end_date, country, state):
             "text": {
                 "path": "country",
                 "query": country
+            }
+        }
+        must_conditions.append(filter)
+
+    if predicted_class != 'null':
+        filter = {
+            "text": {
+                "path": "predicted_class",
+                "query": predicted_class
             }
         }
         must_conditions.append(filter)
@@ -55,7 +64,7 @@ def parse_parameters(start_date, end_date, country, state):
 
     return conditions
 
-def query(start_date, end_date, country, state, query, chat_history):
+def query(start_date, end_date, country, state, query, predicted_class, chat_history):
     '''
 
     Args:
@@ -111,7 +120,7 @@ def query(start_date, end_date, country, state, query, chat_history):
     QA_CHAIN_PROMPT = PromptTemplate.from_template(prompt_template)
 
     # generate conditions
-    must_conditions = parse_parameters(start_date, end_date, country, state)
+    must_conditions = parse_parameters(start_date, end_date, country, state, predicted_class)
 
     chain = ConversationalRetrievalChain.from_llm(
         llm=llm, 
@@ -131,12 +140,13 @@ def query(start_date, end_date, country, state, query, chat_history):
     )
 
     # chat_history = [chat_history]
-    print(chain)
+    #print(chain)
     answer = chain({"question": query, "chat_history": chat_history})
     print(answer["source_documents"][0].metadata['state'])
     print(answer["source_documents"][0].metadata['country'])
     print(answer["source_documents"][0].metadata['messageDatetime'])
-    print(answer["source_documents"][0].page_content)
+    print(answer["source_documents"][0].metadata['predicted_class'])
+    #(answer["source_documents"][0].page_content)
     print(answer["answer"])
         
-query('null', 'null', 'Switzerland', 'Zurich', 'Can I get free clothes in Zurich?', [])
+query('null', 'null', 'Switzerland', 'Zurich', 'null', 'Can I get free clothes in Zurich?', [])
