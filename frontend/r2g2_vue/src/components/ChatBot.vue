@@ -67,7 +67,7 @@ const props = {
   expandTrigger: 'hover' as const,
 }
 const prop = defineProps({
-  selectedNews: String,
+  selectedNews: [String, Array],
   selectedState: String,
   minDate: String,
   maxDate: String,
@@ -97,11 +97,11 @@ const sendMessage = async (message: string) => {
     data: message,
   });
   const requestBody = {
-      start_date: prop.minDate,
-      end_date: prop.maxDate,
+      start_date: prop.minDate !== "" ? prop.minDate : "null",
+      end_date: prop.maxDate !== "" ? prop.maxDate : "null",
       country: "Switzerland",
-      state: prop.selectedState,
-      predicted_class: prop.selectedNews,
+      state: prop.selectedState !== "" ? prop.selectedState : "null",
+      predicted_class: Array.isArray(prop.selectedNews) ? "null" : (prop.selectedNews !== "" ? prop.selectedNews : "null"),
       query: message,
       chat_history: [],
   };

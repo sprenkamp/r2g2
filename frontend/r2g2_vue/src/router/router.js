@@ -1,7 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Home from '../components/Home.vue'
-import TelegramPage from '../components/TelegramPage.vue'
-import Page2 from '../components/Page2.vue'
+import Telegram from '../components/Telegram.vue'
 
 const routes = [
   {
@@ -10,14 +9,9 @@ const routes = [
     component: Home,
   },
   {
-    path: "/Telegrampage",
+    path: "/Telegram",
     name: 'Telegram',
-    component: TelegramPage
-  },
-  {
-    path: "/Page2",
-    name: 'Page2',
-    component: Page2
+    component: Telegram
   },
 ];
 

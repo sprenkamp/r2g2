@@ -17,17 +17,10 @@
             </el-menu-item>
         </router-link>
 
-        <router-link to="/Telegrampage" class="Telegram">
-            <el-menu-item index="1">
-                <el-icon><icon-menu /></el-icon>
-                Telegram
-            </el-menu-item>
-        </router-link>
-
-        <router-link to="/Page2" class="Page2">
+        <router-link to="/Telegram" class="Telegram">
             <el-menu-item index="2">
                 <el-icon><list /></el-icon>
-                Page 2
+                Telegram
             </el-menu-item>
         </router-link>
 

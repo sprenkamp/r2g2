@@ -54,7 +54,7 @@ export default {
         plugins: {
           title: {
             display: true,
-            text: 'Title',
+            text: 'Cluters Overtime',
             fontSize: 20,
           },
           legend: {
