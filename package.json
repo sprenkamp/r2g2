@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build-frontend": "cd frontend/ && npm install && npm run build",
+    "build-frontend": "cd frontend/r2g2_vue && npm install && npm run build",
     // other scripts
   },
   "dependencies": {
