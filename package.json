@@ -1,6 +1,11 @@
 {
+  "scripts": {
+    "build-frontend": "cd frontend/ && npm install && npm run build",
+    // other scripts
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.3.1"
+    // other dependencies
   }
 }
