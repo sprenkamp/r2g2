@@ -5,8 +5,12 @@ const app = express();
 const dotenv = require("dotenv");
 const cors = require("cors")
 dotenv.config()
-app.use(cors());
 app.use(compression());
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 
 app.get('/:databaseName/:collectionName', async (req, res) => {
   const databaseName = req.params.databaseName;
