@@ -30,4 +30,4 @@ jobs:
           ATLAS_USER: ${{ secrets.ATLAS_USER }}
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/DACH.txt -o scrape.telegram
+        run: python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/switzerland_groups.txt -o scrape.telegram
