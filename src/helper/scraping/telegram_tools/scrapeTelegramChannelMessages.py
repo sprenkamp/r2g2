@@ -214,18 +214,20 @@ async def callAPI(input_file_path):
                 if message.message is not None and message.message != '':
                     record = dict()
                     record['chat'] = chat
-                    record['channel_id'] = message.peer_id.channel_id
+
                     record['messageDatetime'] = message.date
-                    record['update_time'] = datetime.datetime.now()
+                    record['messageDate'] = message.date.strftime("%Y-%m-%d")
+                    record['messageUpdateTime'] = datetime.datetime.now()
                     record['country'] = country
                     record['state'] = state
                     record['city'] = city
                     record['messageText'] = message.message
+
                     record['views'] = message.views if message.views is not None else 0
                     record['forwards'] = message.forwards if message.forwards is not None else 0
 
-                    if len(message.message) > 40:
-                        record['embedding'] = get_embedding(message.message)
+                    # if len(message.message) > 100:
+                    #     record['embedding'] = get_embedding(message.message)
 
                     if message.replies is None:
                         record['replies'] = 0
@@ -256,11 +258,17 @@ async def callAPI(input_file_path):
 
 if __name__ == '__main__':
     """
-    example usage in command line:
+    ### example usage in command line:
 
-    python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py -i data/telegram/queries/DACH.txt -o scrape.telegram
+    (1) switzerland+germany
+    python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py \
+    -i data/telegram/queries/DACH.txt -o scrape.telegram
 
-    Read chats from DACH.txt and store telegram data to database.
+    (2) only switzerland
+    python src/helper/scraping/telegram_tools/scrapeTelegramChannelMessages.py \
+    -i data/telegram/queries/switzerland_groups.txt -o scrape.telegram
+
+    ### Read chats from DACH.txt and store telegram data to database.
 
     (1) scrape telegram data
     (2) get embedding of each sentence
