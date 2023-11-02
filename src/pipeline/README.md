@@ -1,6 +1,6 @@
 # pipeline
 ## design logic
-![img.png](/Users/luojiayu/Downloads/semester2/master_project/pipeline.png)
+![img.png](pipeline.png)
 
 ## stage description
 | stage | logic                                                                                    | output                                               | status         |
