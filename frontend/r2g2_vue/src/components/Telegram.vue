@@ -198,58 +198,6 @@
   
     async created(){
         this.isLoading = true;
-        // try {
-        //   this.asyncRequests = [
-        //     this.fetch(),
-        //     this.$getCluster_tele(this.dataTele),
-        //     this.$getState_tele(this.dataTele),
-        //     this.$getDate_tele(this.dataTele),
-        //   ];
-
-        //   const [response1, response2, response3, response4] = await Promise.all(this.asyncRequests);
-
-        //   this.dataTele = response1.data;
-        //   this.newsOptions = response2.map((cluster) => ({
-        //     value: cluster !== undefined ? cluster : "undefined",
-        //   }));
-
-        //   this.selectedNews = this.newsOptions.map(option => option.value);
-        //   this.stateOptions = response3.map((state) => ({
-        //     value: state,
-        //   }));
-
-        //   this.dateOptions = response4;
-        //   this.minDate = this.dateOptions[0];
-        //   this.maxDate = this.dateOptions[this.dateOptions.length - 1];
-        //   this.selectedDate = [this.minDate, this.maxDate];
-
-        //   // Load data and draw chart
-        //   const allClustersData = {};
-
-        //   for (const targetDate of this.dateOptions) {
-        //     const allClustersCount = await this.$countedCluster(this.dataTele, targetDate);
-        //     allClustersData[targetDate] = allClustersCount;
-        //   }
-
-        //   // moving average
-        //   // const aftermovingAverage = await this.$movingAverage(allClustersData, 21);
-        //   this.chartData = {
-        //     labels: this.dateOptions,
-        //     datasets: this.newsOptions.map((option) => ({
-        //       tension: 0.3,
-        //       label: option.value,
-        //       data: this.dateOptions.map((date) => allClustersData[date][option.value] || 0),
-        //       borderWidth: 2,
-        //       fill: false,
-        //       pointStyle: false,
-        //     }))
-        //   };
-        //   this.filteredData = await this.filterDataByCountryAndState();
-        //   this.isLoading = false;
-        // } catch (error) {
-        //   console.error('加载资源时出错：', error);
-        //   // 处理错误情况
-        // }
       
         await this.fetch();
 
@@ -324,8 +272,8 @@
               this.dataTele = this.cachedData.dataTele;
           } else {
               try {
-                  // const response = await axios.get('http://localhost:8000/aggregate/TelegramCount');
-                  const response = await axios.get('http://51.20.75.190:8000/aggregate/TelegramCount', 
+                  // const response = await axios.get('https://51.20.75.190:8000/aggregate/TelegramCount');
+                  const response = await axios.get('https://db.governmentasaplatform.ch/aggregate/TelegramCount', 
                     {withCredentials: true,
                   });
                   this.dataTele = response.data;
@@ -395,17 +343,17 @@
           }
           this.updateChartData();
       },
-      handleCountryAndStateChanged({ selectedCountry, selectedState }) {
-          this.selectedCountry = selectedCountry;
-          this.selectedState = selectedState;
-      },
+      // handleCountryAndStateChanged({ selectedCountry, selectedState }) {
+      //     this.selectedCountry = selectedCountry;
+      //     this.selectedState = selectedState;
+      // },
       handleStateSelected(selectedState) {
           this.selectedState = selectedState;
       },
-      toggleSidebar() {
-        this.showSidebar = !this.showSidebar;
-        this.sidebarIcon = this.showSidebar ? arrowleft : arrowright;
-      },
+      // toggleSidebar() {
+      //   this.showSidebar = !this.showSidebar;
+      //   this.sidebarIcon = this.showSidebar ? arrowleft : arrowright;
+      // },
       toggleChatbot() {
         this.showChatbot = !this.showChatbot;
       },

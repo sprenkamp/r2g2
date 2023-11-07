@@ -1,3 +1,5 @@
+# scp -i "D:\aws_key\aws_node.pem" "D:\visualstudiocode\project\r2g2\r2g2\src\machine_learning\chat\docker\chat_fastapi.py" ec2-user@ec2-13-53-123-5.eu-north-1.compute.amazonaws.com:/home/ec2-user/
+
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -27,10 +29,18 @@ class QueryRequest(BaseModel):
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        'https://governmentasaplatform.ch',
+        'https://www.governmentasaplatform.ch',
+        'https://bot.governmentasaplatform.ch/query',
+        'https://bot.governmentasaplatform.ch',
+        'governmentasaplatform.ch',
+        'bot-load-balancer-175078596.eu-north-1.elb.amazonaws.com',
+        'http://localhost:5173',
+        ],
     allow_credentials=True,
-    allow_methods=["*"], 
-    allow_headers=["*"], 
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # The local machine should have the following environment variables:
@@ -106,6 +116,16 @@ def query(query_request: QueryRequest):
         predicted_class: string e.g. 'Education'
         query: string e.g. 'Can I get free clothes in Zurich?'
         chat_history: array
+        
+        {
+                    "start_date": "2022-01-01",
+                    "end_date": "2022-01-10",
+                    "country": "Switzerland",
+                    "state": "Zurich",
+                    "predicted_class": "Education",
+                    "query": "hello",
+                    "chat_history": []
+        }
 
     Returns:
 
