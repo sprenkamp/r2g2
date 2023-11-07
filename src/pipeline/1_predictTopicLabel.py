@@ -54,7 +54,7 @@ def add_topic_label(collection):
         # Update the documents in the collection with the new 'predicted_class'
         # By using UpdateOne with the $set operator, the code updates the documents without disturbing any other existing fields
         update_operations = [
-            UpdateOne({'_id': row['_id']}, {'$set': {'predicted_class': row['predicted_class'], 'topicUpdateDate': datetime.datetime.utcnow()}})
+            UpdateOne({'_id': row['_id']}, {'$set': {'predicted_class': row['predicted_class'], 'predicted_key': row['predicted_key'],'topicUpdateDate': datetime.datetime.utcnow()}})
             for index, row in df.iterrows()
         ]
         if update_operations:
