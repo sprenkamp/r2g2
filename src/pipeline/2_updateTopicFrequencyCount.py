@@ -1,11 +1,9 @@
-# TODO update aggregate.TelegramCount
-
 import os
 from pymongo import MongoClient
 import argparse
 
 # Parse command-line arguments
-parser = argparse.ArgumentParser(description="Aggregate messageDate and predicted_class to update TelegramCount.")
+parser = argparse.ArgumentParser(description="Aggregate messageDate, predicted_class, state, and country to update count.")
 parser.add_argument('-o', '--output_database', required=True, help="Specify the output database and collection in the format 'database.collection'")
 args = parser.parse_args()
 
@@ -20,20 +18,17 @@ ATLAS_USER = os.getenv("ATLAS_USER")
 cluster = MongoClient(f"mongodb+srv://{ATLAS_USER}:{ATLAS_TOKEN}@cluster0.mongodb.net/")
 collection = cluster[db_name][collection_name]
 
-# Aggregate to count the predicted_class occurrences by messageDate
+# Aggregate to count the occurrences of predicted_class for each combination of messageDate, state, and country
 pipeline = [
-    {
-        '$match': {
-            'TelegramCount': {'$exists': False}  # Filter to consider only documents without TelegramCount
-        }
-    },
     {
         '$group': {
             '_id': {
                 'messageDate': '$messageDate',
-                'predicted_class': '$predicted_class'
+                'predicted_class': '$predicted_class',
+                'state': '$state',
+                'country': '$country'
             },
-            'TelegramCount': {'$sum': 1}  # Count the occurrences
+            'count': {'$sum': 1}  # Count the occurrences
         }
     }
 ]
@@ -41,15 +36,16 @@ pipeline = [
 # Execute the aggregation pipeline
 results = list(collection.aggregate(pipeline))
 
-# Update the documents with the new TelegramCount
+# Update the documents with the new count
 for result in results:
     collection.update_many(
         {
             'messageDate': result['_id']['messageDate'],
             'predicted_class': result['_id']['predicted_class'],
-            'TelegramCount': {'$exists': False}
+            'state': result['_id']['state'],
+            'country': result['_id']['country']
         },
         {
-            '$set': {'TelegramCount': result['TelegramCount']}
+            '$set': {'count': result['count']}
         }
     )
