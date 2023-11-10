@@ -5,11 +5,6 @@ import argparse
 from pymongo import MongoClient
 from pymongo import InsertOne, DeleteMany, ReplaceOne, UpdateOne
 import pandas as pd
-import datetime
-pd.set_option('display.max_colwidth', None)
-pd.set_option('display.max_columns', None)
-import openai
-openai.api_key = os.environ["OPENAI_API_KEY"]
 
 from bertopic import BERTopic  # Ensure bertopic is installed （modified）
 
@@ -43,8 +38,6 @@ def add_topic_label(collection):
         data = bson.decode_all(batch)
         df = pd.DataFrame(list(data))
 
-        # TODO give topic label to messages in batch
-        # modification starts here
         # Use BERTopic to give topic label to messages in batch         
         documents = df['messageText'].tolist()  
         topics, _ = topic_model.transform(documents) 
@@ -54,12 +47,12 @@ def add_topic_label(collection):
         # Update the documents in the collection with the new 'predicted_class'
         # By using UpdateOne with the $set operator, the code updates the documents without disturbing any other existing fields
         update_operations = [
-            UpdateOne({'_id': row['_id']}, {'$set': {'predicted_class': row['predicted_class'], 'predicted_key': row['predicted_key'],'topicUpdateDate': datetime.datetime.utcnow()}})
+            UpdateOne({'_id': row['_id']}, {'$set': {'predicted_class': row['predicted_class'], 'predicted_key': row['predicted_key']}})
             for index, row in df.iterrows()
         ]
         if update_operations:
             collection.bulk_write(update_operations)
-        # modification ends here
+
 if __name__ == '__main__':
 
     '''
