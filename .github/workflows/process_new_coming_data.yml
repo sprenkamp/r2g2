@@ -1,0 +1,55 @@
+name: generate_bertopic_embedding
+
+on:
+  schedule:
+    - cron: '0 0 * * 2' # At 00:00
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: set timezone
+        uses: szenius/set-timezone@v1.2
+        with:
+          timezoneLinux: "Europe/Switzerland"
+          
+
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
+      - run: pip install -r add src/pipeline/requirements.txt
+      
+      - name: generate bertopic
+        env:
+          ATLAS_USER: ${{ secrets.ATLAS_USER }}
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+        run: python src/pipeline/1_predictTopicLabel.py -o test.telegram
+        
+      - name: generate bertopic
+        env:
+          ATLAS_USER: ${{ secrets.ATLAS_USER }}
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+        run: python src/pipeline/2_calculateMessageWithoutBertTopic.py -o test.telegram
+
+      - name: generate embedding
+        env:
+          ATLAS_USER: ${{ secrets.ATLAS_USER }}
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python src/pipeline/3_assignEmbeddingToMessage.py -o test.telegram
+
+      - name: calculate frequency for each country-state-topic-date
+        env:
+          ATLAS_USER: ${{ secrets.ATLAS_USER }}
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+        run: python src/pipeline/3_updateTopicFrequencyCount.py -i test.telegram -o test.TelegramCount
+
+
+      - name: add completion labels
+        env:
+          ATLAS_USER: ${{ secrets.ATLAS_USER }}
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
+        run: python src/pipeline/4_addCompletionLabel.py -o test.telegram
