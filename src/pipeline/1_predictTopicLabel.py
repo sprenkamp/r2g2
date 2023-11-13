@@ -24,7 +24,7 @@ def add_topic_label(collection):
 
     import bson
 
-    batch_size = 1000
+    batch_size = 5000
     topic_model = BERTopic.load("Alprocco/Bert_Ukr_in_Swiss")  # Load your pretrained BERTopic model （modified）
     # Load mapping（modified）
     topic_mapping = {-1: {'cluster_id': -1.0, 'cluster_name': 'Unknown', 'sub_cluster': 'Unknown'},
