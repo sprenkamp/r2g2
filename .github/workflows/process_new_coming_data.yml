@@ -21,13 +21,13 @@ jobs:
           python-version: '3.9'
           cache: 'pip' # caching pip dependencies
       - run: pip install -r add src/pipeline/requirements.txt
-      
+
       - name: generate bertopic
         env:
           ATLAS_USER: ${{ secrets.ATLAS_USER }}
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
         run: python src/pipeline/1_predictTopicLabel.py -o test.telegram
-        
+
       - name: generate bertopic
         env:
           ATLAS_USER: ${{ secrets.ATLAS_USER }}
