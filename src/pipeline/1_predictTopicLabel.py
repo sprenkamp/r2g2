@@ -316,6 +316,11 @@ def add_topic_label(collection):
     projection = {'_id': 1, 'messageText': 1}
     cursor = collection.find_raw_batches(selection_criteria, projection, batch_size=batch_size)
 
+    if len(list(cursor.clone())) == 0:
+        print("--**-- There is no updated data. Possible reasons: --**--")
+        print("(1) No updated messages in our current Chats")
+        print("(2) Telegram scraping pipeline is Down. Please check the status is pipeline https://github.com/sprenkamp/r2g2/actions/workflows/scraping_telegram.yml")
+
     # Iterate through the cursor in batches
     for batch in cursor:
         data = bson.decode_all(batch)

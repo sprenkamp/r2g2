@@ -63,10 +63,10 @@ if __name__ == '__main__':
     Add messageDate to the whole collection: scrape.telegram
     use command:
         (1) prd dataset
-        python src/pipeline/2_assignEmbeddingToMessage.py -o scrape.telegram
+        python src/pipeline/3_assignEmbeddingToMessage.py -o scrape.telegram
 
         (2) testing dataset
-        python src/pipeline/2_assignEmbeddingToMessage.py -o test.telegram
+        python src/pipeline/3_assignEmbeddingToMessage.py -o test.telegram
     
     '''
 

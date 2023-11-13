@@ -18,7 +18,8 @@ def calculate_message_without_bert_topic_label(collection):
     pipeline = [
         {
             '$match': {
-                "topicUpdateDate": {'$exists': False},
+                "topicUpdateDate": {'$exists': False},  # indicate new coming data
+                "predicted_class": {'$exists': False},  # need bert topic
             }
         },
         {
@@ -30,19 +31,24 @@ def calculate_message_without_bert_topic_label(collection):
     ]
     res = collection.aggregate(pipeline)
 
-    print('--**-- Message need topic label --**--')
     df = pd.DataFrame(list(res))
-    print(df)
+    if len(df) > 0:
+        print('--**-- Message need topic label --**--')
+        print(df)
+        print("total records:", df['#data need bert topic'].sum())
+        print("Please check whether you have give bert topic for all new messages")
+    else:
+        print("All data have bert topic")
 
 if __name__ == '__main__':
     '''
     Add messageDate to the whole collection: scrape.telegram
     use command:
         (1) prd dataset
-        python src/pipeline/0_calculateMessageWithoutBertTopic.py -i scrape.telegram
+        python src/pipeline/2_calculateMessageWithoutBertTopic.py -i scrape.telegram
 
         (2) testing dataset
-        python src/pipeline/0_calculateMessageWithoutBertTopic.py -i test.telegram
+        python src/pipeline/2_calculateMessageWithoutBertTopic.py -i test.telegram
 
     '''
 

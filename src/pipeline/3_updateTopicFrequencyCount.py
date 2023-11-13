@@ -9,10 +9,10 @@ import argparse
 Add messageDate to the whole collection: scrape.telegram
 use command:
     (1) prd
-    python src/pipeline/2_updateTopicFrequencyCount.py -i scrape.telegram -o aggregate.TelegramCount
+    python src/pipeline/3_updateTopicFrequencyCount.py -i scrape.telegram -o aggregate.TelegramCount
 
     (2)test
-    python src/pipeline/2_updateTopicFrequencyCount.py -i test.telegram -o test.TelegramCount
+    python src/pipeline/3_updateTopicFrequencyCount.py -i test.telegram -o test.TelegramCount
 '''
 
 # Parse command-line arguments
@@ -72,14 +72,18 @@ pipeline = [
             'count': 1
         }
     },
-    {
-        '$merge': {
-            "into": {"db": o_db_name, "coll": o_collection_name},
-            "on": "_id",
-            "whenMatched": "replace",
-            "whenNotMatched": "insert"
-        }
-    }
+    # append
+    # {
+    #     '$merge': {
+    #         "into": {"db": o_db_name, "coll": o_collection_name},
+    #         "on": "_id",
+    #         "whenMatched": "replace",
+    #         "whenNotMatched": "insert"
+    #     }
+    # }
+
+    # overwrite
+    {'$out': {"db": o_db_name, "coll": o_collection_name}}
 ]
 
 collection.aggregate(pipeline)
