@@ -28,11 +28,11 @@ jobs:
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
         run: python src/pipeline/1_predictTopicLabel.py -o test.telegram
         
-      - name: generate bertopic
+      - name: calculate Message Without BertTopic
         env:
           ATLAS_USER: ${{ secrets.ATLAS_USER }}
           ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }}
-        run: python src/pipeline/2_calculateMessageWithoutBertTopic.py -o test.telegram
+        run: python src/pipeline/2_calculateMessageWithoutBertTopic.py -i test.telegram
 
       - name: generate embedding
         env:
