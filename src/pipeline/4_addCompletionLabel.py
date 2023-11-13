@@ -22,8 +22,10 @@ def add_end_label(collection):
 
     '''
 
+    # select new coming data and ensure these data have been process completely
     selection_criteria = {
         "topicUpdateDate": {'$exists': False},
+        "predicted_class": {'$exists': True},
     }
 
     from datetime import date
@@ -37,9 +39,9 @@ if __name__ == '__main__':
     Add messageDate to the whole collection: scrape.telegram
     use command:
         （1） prd dataset
-        python src/pipeline/1_predictTopicLabel.py -o scrape.telegram
+        python src/pipeline/4_addCompletionLabel.py -o scrape.telegram
         （2） testing dataset
-        python src/pipeline/1_predictTopicLabel.py -o test.telegram        
+        python src/pipeline/4_addCompletionLabel.py -o test.telegram        
     '''
 
     # parse parameters

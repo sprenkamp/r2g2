@@ -40,7 +40,6 @@ def add_embedding(collection):
         "topicUpdateDate": {'$exists': False},
         "predicted_class": {'$exists': True, "$ne": 'Unknown'},
         "$expr": {"$gt": [{"$strLenCP": '$messageText'}, message_len_threshold]},
-        # "chat": 'https://t.me/helpfulinfoforua'
     }
     projection = {'_id': 1, 'messageText': 1}
     cursor = collection.find_raw_batches(selection_criteria, projection, batch_size=batch_size)
@@ -63,7 +62,12 @@ if __name__ == '__main__':
     '''
     Add messageDate to the whole collection: scrape.telegram
     use command:
-        python src/pipeline/2_assignEmbeddingToMessage.py -o scrape.telegram
+        (1) prd dataset
+        python src/pipeline/3_assignEmbeddingToMessage.py -o scrape.telegram
+
+        (2) testing dataset
+        python src/pipeline/3_assignEmbeddingToMessage.py -o test.telegram
+    
     '''
 
     # parse parameters
