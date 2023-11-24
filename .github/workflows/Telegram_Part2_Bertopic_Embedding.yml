@@ -1,4 +1,4 @@
-name: generate_bertopic_embedding
+name: Telegram_Part2_Bertopic_Embedding
 
 on:
   schedule:
