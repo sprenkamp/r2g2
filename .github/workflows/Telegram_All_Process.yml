@@ -1,4 +1,4 @@
-name: generate_bertopic_embedding
+name: Telegram_All_Process
 
 on:
   schedule:
