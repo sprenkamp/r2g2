@@ -7,9 +7,6 @@ import pandas as pd
 pd.set_option('display.max_colwidth', None)
 pd.set_option('display.max_columns', None)
 
-import openai
-openai.api_key = os.environ["OPENAI_API_KEY"]
-
 def add_end_label(collection):
     '''
     load pretrained bert model and generate topic labeling.
