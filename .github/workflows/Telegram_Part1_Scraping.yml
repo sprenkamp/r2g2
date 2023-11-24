@@ -20,9 +20,9 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pip' # caching pip dependencies
-      - run: pip install -r src/helper/scraping/telegram_tools/requirements.txt
+      - run: pip install -r src/pipeline/requirements.txt
           
-      - name: execute py script
+      - name: Step0 scraping
         env:
           TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
           TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
