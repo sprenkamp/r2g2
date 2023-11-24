@@ -1,7 +1,11 @@
 argparse==1.4.0
+asyncio==3.4.3
+bertopic
 datetime==5.1
+geosky==1.0.9
 openai==0.28.0
 pandas==2.0.2
 pymongo==4.4.0
 python-dotenv==1.0.0
-bertopic
+telethon==1.29.1
+tqdm==4.64.1
