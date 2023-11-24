@@ -13,7 +13,7 @@ Pipeline:
 Telegram_Part1_Scraping.yml   
 Telegram_Part2_Bertopic_Embedding.yml
 
-Step 2 just services as a checking script, which is unneeded for current design. However, owing to the storage constraint for Github Action's free tier, Step 1 may neet to be manually run in the local environment.     We may set error throwing in step 2 (not have now), which will compel step 2 to fail when developers fail to do step 1 manually on time. As a result, the repo owner receives emails, reruns step1, and restart pipeline (step 2-4) in Github Action.
+Step 2 just services as a checking script, which is unneeded for current design. However, owing to the storage constraint for Github Action's free tier, Step 1 may neet to be manually run in the local environment.     We may set error throwing in step 2 (not have now), which will compel step 2 to fail when developers fail to do step 1 manually on time. As a result, the repo owner receives emails, reruns step1, and restart pipeline 'Telegram_Part2_Bertopic_Embedding' (step 2-4) in Github Action.
 
 ## stage description
 | stage | logic                                                                                    | output                                                                 | status |
