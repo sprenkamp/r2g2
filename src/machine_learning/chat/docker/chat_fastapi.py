@@ -7,8 +7,9 @@ load_dotenv()
 from langchain.prompts import PromptTemplate
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory 
+# from langchain.chains import ConversationalRetrievalChain
+from langchain.chains import RetrievalQA
+# from langchain.memory import ConversationBufferMemory 
 from langchain.vectorstores import MongoDBAtlasVectorSearch
 from fastapi.middleware.cors import CORSMiddleware
 from pymongo import MongoClient
@@ -151,10 +152,10 @@ def query(query_request: QueryRequest):
     )
 
     # create the memory object
-    memory = ConversationBufferMemory( 
-    memory_key='chat_history', 
-    return_messages=True, 
-    output_key='answer')
+    # memory = ConversationBufferMemory( 
+    # memory_key='chat_history', 
+    # return_messages=True, 
+    # output_key='answer')
 
     # create the large leanguage model object
     llm=ChatOpenAI(temperature=0.0, model_name='gpt-3.5-turbo-16k', openai_api_key=api_key)
@@ -172,7 +173,7 @@ def query(query_request: QueryRequest):
     must_conditions = parse_parameters(start_date, end_date, country, state, predicted_class)
     print(must_conditions)
     # create a chatbot chain
-    chain = ConversationalRetrievalChain.from_llm(
+    chain = RetrievalQA.from_llm(
         llm=llm, 
         retriever=vectors.as_retriever(search_type = 'mmr',
                                        search_kwargs={
@@ -183,20 +184,22 @@ def query(query_request: QueryRequest):
                                                    }
                                                 },
                                        }),
-        memory = memory,
+        # memory = memory,
         return_source_documents=True,
-        return_generated_question=True,
-        combine_docs_chain_kwargs={"prompt": QA_CHAIN_PROMPT}
+        # return_generated_question=True,
+        # combine_docs_chain_kwargs={"prompt": QA_CHAIN_PROMPT}
     )
 
     # create the chat
-    answer = chain({"question": query, "chat_history": chat_history})
+    answer = chain({"query": query})
+    print(answer)
+    #, "chat_history": chat_history})
     # for i in range(10):
     #     print(answer["source_documents"][i].metadata['state'])
     #     print(answer["source_documents"][i].metadata['country'])
     #     print(answer["source_documents"][i].metadata['messageDatetime'])
     #print(answer["source_documents"][0].page_content)
-    return answer["answer"], answer['chat_history']
+    return answer["result"] #, answer['chat_history']
 
 @app.get("/test")
 def test_endpoint():
