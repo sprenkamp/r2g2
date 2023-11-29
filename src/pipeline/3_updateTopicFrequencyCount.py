@@ -49,43 +49,114 @@ pipeline = [
     {
         '$group': {
             '_id': {
-                'messageDate': '$messageDate',
-                'predicted_class': '$predicted_class',
+                'country': '$country',
                 'state': '$state',
-                'country': '$country'
+                'predicted_class': '$predicted_class',
+                'messageDate': '$messageDate'
             },
-            'count': {'$sum': 1}  # Count the occurrences
+            'count': {'$sum': 1}
+        }
+    },
+    {
+        '$sort': {
+            # '_id.country': 1,
+            # '_id.predicted_class': 1,
+            # '_id.state': 1,
+            '_id.messageDate': -1
+        }
+    },
+    {
+        '$group': {
+            '_id': {
+                'country': '$_id.country',
+                'state': '$_id.state',
+                'predicted_class': '$_id.predicted_class',
+            },
+            'fre': {
+                '$push': {
+                    'messageDate': '$_id.messageDate',
+                    'count': '$count'
+                }
+            }
         }
     },
     {
         '$project': {
-            'messageDate': '$_id.messageDate',
-            'predicted_class': '$_id.predicted_class',
-            'state': '$_id.state',
+            '_id': 0,
             'country': '$_id.country',
-            '_id': {
-                # to make the _id take less space: compact all keys together
-                '$concat': [
-                    '$_id.messageDate', '-', '$_id.predicted_class', '-', '$_id.state', '-', '$_id.country'
-                ]
-            },
-            'count': 1
+            'state': '$_id.state',
+            'predicted_class': '$_id.predicted_class',
+            'fre': 1
         }
     },
-    # append
-    # {
-    #     '$merge': {
-    #         "into": {"db": o_db_name, "coll": o_collection_name},
-    #         "on": "_id",
-    #         "whenMatched": "replace",
-    #         "whenNotMatched": "insert"
-    #     }
-    # }
 
     # overwrite
     {'$out': {"db": o_db_name, "coll": o_collection_name}}
 ]
 
+# by country, state, predicted_class and messageDate
+collection.aggregate(pipeline)
+
+
+# by country, predicted_class and messageDate
+pipeline = [
+    {
+        '$match': {
+            "messageDate": {'$exists': True},
+            "predicted_class": {'$exists': True},
+            "state": {'$exists': True},
+            "country": {'$exists': True},
+        }
+    },
+    {
+        '$group': {
+            '_id': {
+                'country': '$country',
+                'predicted_class': '$predicted_class',
+                'messageDate': '$messageDate'
+            },
+            'count': {'$sum': 1}
+        }
+    },
+    {
+        '$sort': {
+            # '_id.country': 1,
+            # '_id.predicted_class': 1,
+            '_id.messageDate': -1
+        }
+    },
+    {
+        '$group': {
+            '_id': {
+                'country': '$_id.country',
+                'predicted_class': '$_id.predicted_class',
+            },
+            'fre': {
+                '$push': {
+                    'messageDate': '$_id.messageDate',
+                    'count': '$count'
+                }
+            }
+        }
+    },
+    {
+        '$project': {
+            '_id': 0,
+            'country': '$_id.country',
+            'state': 'all',
+            'predicted_class': '$_id.predicted_class',
+            'fre': 1
+        }
+    },
+    {
+        '$merge': {
+            "into": {"db": o_db_name, "coll": o_collection_name},
+            "on": "_id",
+            "whenMatched": "replace",
+            "whenNotMatched": "insert"
+        }
+    }
+]
 collection.aggregate(pipeline)
 
 cluster.close()
