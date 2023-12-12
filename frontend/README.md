@@ -38,35 +38,35 @@ To deploy the backend on AWS, follow these steps:
 1. Create two AWS EC2 instances, one is for database, one is for chatbot. Remember to store **keys** in your computer and give enough permission.
 2. Setup environment for both instances. Here we chose to upload **file codes**, **requirment.txt** and the **.env** of each service rather than the whole repository. To upload files into instances, open terminal and use the code below:
 
-```sh
-scp -i /path/to/your-key.pem /path/to/connect.js ec2-user@example.com:/home/username/
-```
-where
-- /path/to/your-key.pem: The path to the EC2 instance key file.
-- /path/to/connect.js: The path to the local file you want to transfer.
-- ec2-user@example.com: The public IPv4 DNS of the EC2 instance.
-- /home/username/: The path to the target directory on the EC2 instance. Usually, /home/ec2-user/
+    ```sh
+    scp -i /path/to/your-key.pem /path/to/connect.js ec2-user@example.com:/home/username/
+    ```
+    where
+    - /path/to/your-key.pem: The path to the EC2 instance key file.
+    - /path/to/connect.js: The path to the local file you want to transfer.
+    - ec2-user@example.com: The public IPv4 DNS of the EC2 instance.
+    - /home/username/: The path to the target directory on the EC2 instance. Usually, /home/ec2-user/
 
 3. Connect to the instance and do some configuration.
 
 - Instance MongoDB
-```sh
-sudo yum update -y
-sudo yum install -y nodejs npm
-npm install mongodb express compression dotenv cors
-npm install
-sudo npm install -g pm2
-pm2 start connect.js
-pm2 startup
-sudo env PATH=$PATH:/usr/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u ec2-user --hp /home/ec2-user
-```
-After the above operations, the database program will run on this instance and run automatically when the instance is restarted to prevent our platform from crashing.
+    ```sh
+    sudo yum update -y
+    sudo yum install -y nodejs npm
+    npm install mongodb express compression dotenv cors
+    npm install
+    sudo npm install -g pm2
+    pm2 start connect.js
+    pm2 startup
+    sudo env PATH=$PATH:/usr/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u ec2-user --hp /home/ec2-user
+    ```
+    After the above operations, the database program will run on this instance and run automatically when the instance is restarted to prevent our platform from crashing.
 
 - Instance chatbot
-```sh
-sudo yum install python3-pip
-pip3 install -r requirements.txt
-sudo nano /etc/systemd/system/myapp.service
-sudo systemctl enable myapp.service
-sudo systemctl start myapp.service
-```
+    ```sh
+    sudo yum install python3-pip
+    pip3 install -r requirements.txt
+    sudo nano /etc/systemd/system/myapp.service
+    sudo systemctl enable myapp.service
+    sudo systemctl start myapp.service
+    ```
