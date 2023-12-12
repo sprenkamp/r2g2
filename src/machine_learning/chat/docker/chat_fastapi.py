@@ -1,4 +1,4 @@
-# scp -i "D:\aws_key\aws_node.pem" "D:\visualstudiocode\project\r2g2\r2g2\src\machine_learning\chat\docker\chat_fastapi.py" ec2-user@ec2-13-53-123-5.eu-north-1.compute.amazonaws.com:/home/ec2-user/
+# scp -i "D:\aws_key\aws_node.pem" "D:\visualstudiocode\project\r2g2\r2g2\src\machine_learning\chat\docker\chat_fastapi.py" ec2-user@ec2-13-53-123-229.eu-north-1.compute.amazonaws.com:/home/ec2-user/
 
 import os
 from dotenv import load_dotenv

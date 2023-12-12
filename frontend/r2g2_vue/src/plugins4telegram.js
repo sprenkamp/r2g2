@@ -24,6 +24,7 @@ const Plugins = function (app, options) {
     return stateCategories;
   };
 
+  // old data format
   app.config.globalProperties.$getDate_tele = async function(data_tele) {
     const validData = data_tele.filter(item => item.messageDate !== undefined);
     const dates = Array.from(new Set(validData.map((item) => item.messageDate)));
@@ -34,6 +35,33 @@ const Plugins = function (app, options) {
     return dateData;
   };
   
+  // new data format
+  app.config.globalProperties.$getDates_tele = function(data_tele) {
+    const dataWithCount = data_tele.map((data) => {
+      const fre = data.fre || [];
+      const totalCount = fre.reduce((sum, item) => sum + item.count, 0);
+      return { data, totalCount };
+    });
+  
+    dataWithCount.sort((a, b) => b.totalCount - a.totalCount);
+    const topThreeData = dataWithCount.slice(0, 3);
+    const dateData = Array.from(
+      new Set(
+        topThreeData
+          .flatMap((data) => data.data.fre.map((item) => item.messageDate))
+          .sort()
+      )
+    );
+    const minDate = new Date(Math.min(...dateData.map(date => new Date(date))));
+    const maxDate = new Date(Math.max(...dateData.map(date => new Date(date))));
+    const dateRange = [];
+    let currentDate = new Date(minDate);
+    while (currentDate <= maxDate) {
+      dateRange.push(currentDate.toISOString().split("T")[0]);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dateRange;
+  };
 
   // function count cluster
   app.config.globalProperties.$countProp_tele = async function(data_tele, targetDate, specifiedCluster) {
@@ -73,6 +101,56 @@ const Plugins = function (app, options) {
     });
     return clustersCount;
   };
+
+  // count cluster for new data
+  app.config.globalProperties.$countedCluster_new = async function(data_tele, targetDate, specifiedCluster) {
+    const clustersCount = {};
+    data_tele.forEach(item => {
+      const fre = item.fre || [];
+      fre.forEach(subItem => {
+        const cluster = item.predicted_class;
+        const date = subItem.messageDate;
+        const count = subItem.count;
+  
+        if (date === targetDate && (!specifiedCluster || specifiedCluster.includes(cluster))) {
+          if (cluster in clustersCount) {
+            clustersCount[cluster] += count;
+          } else {
+            clustersCount[cluster] = count;
+          }
+        }
+      });
+    });
+    return clustersCount;
+  };
+
+  // state = all for initialize graph
+  app.config.globalProperties.$countedCluster_all = async function(data_tele, targetDate, specifiedCluster) {
+    const clustersCount = {};
+  
+    data_tele.forEach(item => {
+      const fre = item.fre || [];
+      const state = item.state;
+  
+      if (state === "all") {
+        fre.forEach(subItem => {
+          const cluster = item.predicted_class;
+          const date = subItem.messageDate;
+          const count = subItem.count;
+  
+          if (date === targetDate && (!specifiedCluster || specifiedCluster.includes(cluster))) {
+            if (!clustersCount[cluster]) {
+              clustersCount[cluster] = 0;
+            }
+            clustersCount[cluster] += count;
+          }
+        });
+      }
+    });
+  
+    return clustersCount;
+  };
+  
 
   // filter data according to country name
   app.config.globalProperties.$countryFilter_tele = async function(data_tele, selectedCountry) {

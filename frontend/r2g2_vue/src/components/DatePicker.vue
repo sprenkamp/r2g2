@@ -21,7 +21,7 @@
 </template>
   
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue'
+import { ref, defineProps, defineEmits} from 'vue'
 
 const { minDate, maxDate } = defineProps(['minDate', 'maxDate'])
 const emits = defineEmits()
@@ -37,6 +37,7 @@ const disabledDate = (time) => {
 const handleDateChange = (value) => {
     emits('selected-date', value)
 }
+
 </script>
 
 <style scoped>

@@ -23,7 +23,13 @@
                 Telegram
             </el-menu-item>
         </router-link>
-
+        
+        <router-link to="/Test" class="Test">
+            <el-menu-item index="2.5">
+                <el-icon><list /></el-icon>
+                Test
+            </el-menu-item>
+        </router-link>
         <!-- <router-link to="/Page3" class="Page3">
             <el-menu-item index="3">
                 <el-icon><setting /></el-icon>
