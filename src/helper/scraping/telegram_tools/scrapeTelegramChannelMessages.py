@@ -1,6 +1,7 @@
 from telethon import TelegramClient, events, sync, errors
 from telethon.sessions import StringSession
 import asyncio
+import time
 import os
 from dotenv import load_dotenv
 
@@ -144,7 +145,9 @@ def parse_state_city(chat, country):
 
 def get_embedding(text, model="text-embedding-ada-002"):
     text = text.replace("\n", " ")
-    return openai.Embedding.create(input=[text], model=model)['data'][0]['embedding']
+    embedding = openai.Embedding.create(input=[text], model=model)['data'][0]['embedding']
+    time.sleep(0.2)
+    return embedding
 
 
 def get_chats_list(input_file_path):
