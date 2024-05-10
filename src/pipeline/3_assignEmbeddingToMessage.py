@@ -1,4 +1,5 @@
 import os
+import time
 from dotenv import load_dotenv
 load_dotenv()
 import argparse
@@ -13,7 +14,9 @@ openai.api_key = os.environ["OPENAI_API_KEY"]
 
 def get_embedding(text, model="text-embedding-ada-002"):
     text = text.replace("\n", " ")
-    return openai.Embedding.create(input=[text], model=model)['data'][0]['embedding']
+    time.sleep(0.2)
+    embedding = openai.Embedding.create(input=[text], model=model)['data'][0]['embedding']
+    return embedding
 
 def add_embedding(collection):
     '''
